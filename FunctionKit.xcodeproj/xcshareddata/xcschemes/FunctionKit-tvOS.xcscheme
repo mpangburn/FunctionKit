@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "895CCDC8207C936700E98D95"
-               BuildableName = "FunctionKit_tvOS.framework"
+               BuildableName = "FunctionKit.framework"
                BlueprintName = "FunctionKit-tvOS"
                ReferencedContainer = "container:FunctionKit.xcodeproj">
             </BuildableReference>
@@ -46,7 +46,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "895CCDC8207C936700E98D95"
-            BuildableName = "FunctionKit_tvOS.framework"
+            BuildableName = "FunctionKit.framework"
             BlueprintName = "FunctionKit-tvOS"
             ReferencedContainer = "container:FunctionKit.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "895CCDC8207C936700E98D95"
-            BuildableName = "FunctionKit_tvOS.framework"
+            BuildableName = "FunctionKit.framework"
             BlueprintName = "FunctionKit-tvOS"
             ReferencedContainer = "container:FunctionKit.xcodeproj">
          </BuildableReference>

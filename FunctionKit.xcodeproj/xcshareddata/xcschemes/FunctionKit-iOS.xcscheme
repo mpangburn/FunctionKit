@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "895CCD9E207C935200E98D95"
-               BuildableName = "FunctionKit_iOS.framework"
+               BuildableName = "FunctionKit.framework"
                BlueprintName = "FunctionKit-iOS"
                ReferencedContainer = "container:FunctionKit.xcodeproj">
             </BuildableReference>
@@ -43,7 +43,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "895CCD9E207C935200E98D95"
-            BuildableName = "FunctionKit_iOS.framework"
+            BuildableName = "FunctionKit.framework"
             BlueprintName = "FunctionKit-iOS"
             ReferencedContainer = "container:FunctionKit.xcodeproj">
          </BuildableReference>
@@ -65,7 +65,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "895CCD9E207C935200E98D95"
-            BuildableName = "FunctionKit_iOS.framework"
+            BuildableName = "FunctionKit.framework"
             BlueprintName = "FunctionKit-iOS"
             ReferencedContainer = "container:FunctionKit.xcodeproj">
          </BuildableReference>
@@ -83,7 +83,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "895CCD9E207C935200E98D95"
-            BuildableName = "FunctionKit_iOS.framework"
+            BuildableName = "FunctionKit.framework"
             BlueprintName = "FunctionKit-iOS"
             ReferencedContainer = "container:FunctionKit.xcodeproj">
          </BuildableReference>

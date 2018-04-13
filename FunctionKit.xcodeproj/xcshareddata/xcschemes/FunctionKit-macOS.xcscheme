@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "895CCDD5207C937000E98D95"
-               BuildableName = "FunctionKit_macOS.framework"
+               BuildableName = "FunctionKit.framework"
                BlueprintName = "FunctionKit-macOS"
                ReferencedContainer = "container:FunctionKit.xcodeproj">
             </BuildableReference>
@@ -46,7 +46,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "895CCDD5207C937000E98D95"
-            BuildableName = "FunctionKit_macOS.framework"
+            BuildableName = "FunctionKit.framework"
             BlueprintName = "FunctionKit-macOS"
             ReferencedContainer = "container:FunctionKit.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "895CCDD5207C937000E98D95"
-            BuildableName = "FunctionKit_macOS.framework"
+            BuildableName = "FunctionKit.framework"
             BlueprintName = "FunctionKit-macOS"
             ReferencedContainer = "container:FunctionKit.xcodeproj">
          </BuildableReference>

@@ -7,12 +7,39 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		893700F9207CB10F0028E244 /* Optional.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893700F8207CB10F0028E244 /* Optional.swift */; };
+		893700FA207CB10F0028E244 /* Optional.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893700F8207CB10F0028E244 /* Optional.swift */; };
+		893700FB207CB10F0028E244 /* Optional.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893700F8207CB10F0028E244 /* Optional.swift */; };
+		893700FC207CB10F0028E244 /* Optional.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893700F8207CB10F0028E244 /* Optional.swift */; };
+		894FA6F0207CAC5300DC5DBE /* PredicateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 894FA6EF207CAC5300DC5DBE /* PredicateTests.swift */; };
+		894FA6F3207CAEAD00DC5DBE /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 894FA6F2207CAEAD00DC5DBE /* Sequence.swift */; };
+		894FA6F4207CAEAD00DC5DBE /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 894FA6F2207CAEAD00DC5DBE /* Sequence.swift */; };
+		894FA6F5207CAEAD00DC5DBE /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 894FA6F2207CAEAD00DC5DBE /* Sequence.swift */; };
+		894FA6F6207CAEAD00DC5DBE /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 894FA6F2207CAEAD00DC5DBE /* Sequence.swift */; };
 		895CCDA9207C935200E98D95 /* FunctionKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 895CCD9F207C935200E98D95 /* FunctionKit.framework */; };
-		895CCDAE207C935200E98D95 /* FunctionKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDAD207C935200E98D95 /* FunctionKitTests.swift */; };
+		895CCDAE207C935200E98D95 /* FunctionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDAD207C935200E98D95 /* FunctionTests.swift */; };
 		895CCDB0207C935200E98D95 /* FunctionKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 895CCDA2207C935200E98D95 /* FunctionKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		895CCDE1207C945E00E98D95 /* FunctionKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 895CCDA2207C935200E98D95 /* FunctionKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		895CCDE2207C945E00E98D95 /* FunctionKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 895CCDA2207C935200E98D95 /* FunctionKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		895CCDE3207C945E00E98D95 /* FunctionKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 895CCDA2207C935200E98D95 /* FunctionKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		895CCDE5207C955700E98D95 /* Function.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDE4207C955700E98D95 /* Function.swift */; };
+		895CCDE6207C955700E98D95 /* Function.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDE4207C955700E98D95 /* Function.swift */; };
+		895CCDE7207C955700E98D95 /* Function.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDE4207C955700E98D95 /* Function.swift */; };
+		895CCDE8207C955700E98D95 /* Function.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDE4207C955700E98D95 /* Function.swift */; };
+		895CCDEA207CA2F800E98D95 /* Consumer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDE9207CA2F800E98D95 /* Consumer.swift */; };
+		895CCDEB207CA2F800E98D95 /* Consumer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDE9207CA2F800E98D95 /* Consumer.swift */; };
+		895CCDEC207CA2F800E98D95 /* Consumer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDE9207CA2F800E98D95 /* Consumer.swift */; };
+		895CCDED207CA2F800E98D95 /* Consumer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDE9207CA2F800E98D95 /* Consumer.swift */; };
+		895CCDEF207CA35900E98D95 /* Provider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDEE207CA35900E98D95 /* Provider.swift */; };
+		895CCDF0207CA35900E98D95 /* Provider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDEE207CA35900E98D95 /* Provider.swift */; };
+		895CCDF1207CA35900E98D95 /* Provider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDEE207CA35900E98D95 /* Provider.swift */; };
+		895CCDF2207CA35900E98D95 /* Provider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDEE207CA35900E98D95 /* Provider.swift */; };
+		895CCDF4207CA3EF00E98D95 /* Predicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDF3207CA3EF00E98D95 /* Predicate.swift */; };
+		895CCDF5207CA3EF00E98D95 /* Predicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDF3207CA3EF00E98D95 /* Predicate.swift */; };
+		895CCDF6207CA3EF00E98D95 /* Predicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDF3207CA3EF00E98D95 /* Predicate.swift */; };
+		895CCDF7207CA3EF00E98D95 /* Predicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895CCDF3207CA3EF00E98D95 /* Predicate.swift */; };
+		89F20FC0207F16B8005FA337 /* ConsumerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89F20FBF207F16B8005FA337 /* ConsumerTests.swift */; };
+		89F20FC2207F2792005FA337 /* ProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89F20FC1207F2792005FA337 /* ProviderTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -26,11 +53,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		893700F8207CB10F0028E244 /* Optional.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Optional.swift; sourceTree = "<group>"; };
+		894FA6EF207CAC5300DC5DBE /* PredicateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredicateTests.swift; sourceTree = "<group>"; };
+		894FA6F2207CAEAD00DC5DBE /* Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequence.swift; sourceTree = "<group>"; };
 		895CCD9F207C935200E98D95 /* FunctionKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FunctionKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		895CCDA2207C935200E98D95 /* FunctionKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FunctionKit.h; sourceTree = "<group>"; };
 		895CCDA3207C935200E98D95 /* Info-iOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-iOS.plist"; sourceTree = "<group>"; };
 		895CCDA8207C935200E98D95 /* FunctionKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FunctionKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		895CCDAD207C935200E98D95 /* FunctionKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionKitTests.swift; sourceTree = "<group>"; };
+		895CCDAD207C935200E98D95 /* FunctionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionTests.swift; sourceTree = "<group>"; };
 		895CCDAF207C935200E98D95 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		895CCDBC207C935C00E98D95 /* FunctionKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FunctionKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		895CCDBF207C935C00E98D95 /* Info-watchOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-watchOS.plist"; sourceTree = "<group>"; };
@@ -38,6 +68,12 @@
 		895CCDCC207C936700E98D95 /* Info-tvOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-tvOS.plist"; sourceTree = "<group>"; };
 		895CCDD6207C937000E98D95 /* FunctionKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FunctionKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		895CCDD9207C937000E98D95 /* Info-macOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-macOS.plist"; sourceTree = "<group>"; };
+		895CCDE4207C955700E98D95 /* Function.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Function.swift; sourceTree = "<group>"; };
+		895CCDE9207CA2F800E98D95 /* Consumer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Consumer.swift; sourceTree = "<group>"; };
+		895CCDEE207CA35900E98D95 /* Provider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Provider.swift; sourceTree = "<group>"; };
+		895CCDF3207CA3EF00E98D95 /* Predicate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Predicate.swift; sourceTree = "<group>"; };
+		89F20FBF207F16B8005FA337 /* ConsumerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsumerTests.swift; sourceTree = "<group>"; };
+		89F20FC1207F2792005FA337 /* ProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +116,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		894FA6F1207CAEA100DC5DBE /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				893700F8207CB10F0028E244 /* Optional.swift */,
+				894FA6F2207CAEAD00DC5DBE /* Sequence.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		895CCD93207C934400E98D95 = {
 			isa = PBXGroup;
 			children = (
@@ -105,7 +150,10 @@
 		895CCDAC207C935200E98D95 /* FunctionKitTests */ = {
 			isa = PBXGroup;
 			children = (
-				895CCDAD207C935200E98D95 /* FunctionKitTests.swift */,
+				89F20FBF207F16B8005FA337 /* ConsumerTests.swift */,
+				895CCDAD207C935200E98D95 /* FunctionTests.swift */,
+				894FA6EF207CAC5300DC5DBE /* PredicateTests.swift */,
+				89F20FC1207F2792005FA337 /* ProviderTests.swift */,
 				895CCDAF207C935200E98D95 /* Info.plist */,
 			);
 			path = FunctionKitTests;
@@ -122,6 +170,11 @@
 		895CCDDF207C939C00E98D95 /* FunctionKit */ = {
 			isa = PBXGroup;
 			children = (
+				895CCDE9207CA2F800E98D95 /* Consumer.swift */,
+				895CCDE4207C955700E98D95 /* Function.swift */,
+				895CCDF3207CA3EF00E98D95 /* Predicate.swift */,
+				895CCDEE207CA35900E98D95 /* Provider.swift */,
+				894FA6F1207CAEA100DC5DBE /* Extensions */,
 			);
 			path = FunctionKit;
 			sourceTree = "<group>";
@@ -131,9 +184,9 @@
 			children = (
 				895CCDA2207C935200E98D95 /* FunctionKit.h */,
 				895CCDA3207C935200E98D95 /* Info-iOS.plist */,
-				895CCDBF207C935C00E98D95 /* Info-watchOS.plist */,
-				895CCDCC207C936700E98D95 /* Info-tvOS.plist */,
 				895CCDD9207C937000E98D95 /* Info-macOS.plist */,
+				895CCDCC207C936700E98D95 /* Info-tvOS.plist */,
+				895CCDBF207C935C00E98D95 /* Info-watchOS.plist */,
 			);
 			path = FunctionKit;
 			sourceTree = "<group>";
@@ -277,18 +330,22 @@
 				TargetAttributes = {
 					895CCD9E207C935200E98D95 = {
 						CreatedOnToolsVersion = 9.3;
+						LastSwiftMigration = 0930;
 					};
 					895CCDA7207C935200E98D95 = {
 						CreatedOnToolsVersion = 9.3;
 					};
 					895CCDBB207C935C00E98D95 = {
 						CreatedOnToolsVersion = 9.3;
+						LastSwiftMigration = 0930;
 					};
 					895CCDC8207C936700E98D95 = {
 						CreatedOnToolsVersion = 9.3;
+						LastSwiftMigration = 0930;
 					};
 					895CCDD5207C937000E98D95 = {
 						CreatedOnToolsVersion = 9.3;
+						LastSwiftMigration = 0930;
 					};
 				};
 			};
@@ -356,6 +413,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				895CCDE5207C955700E98D95 /* Function.swift in Sources */,
+				894FA6F3207CAEAD00DC5DBE /* Sequence.swift in Sources */,
+				895CCDEF207CA35900E98D95 /* Provider.swift in Sources */,
+				895CCDEA207CA2F800E98D95 /* Consumer.swift in Sources */,
+				895CCDF4207CA3EF00E98D95 /* Predicate.swift in Sources */,
+				893700F9207CB10F0028E244 /* Optional.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -363,7 +426,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				895CCDAE207C935200E98D95 /* FunctionKitTests.swift in Sources */,
+				89F20FC0207F16B8005FA337 /* ConsumerTests.swift in Sources */,
+				89F20FC2207F2792005FA337 /* ProviderTests.swift in Sources */,
+				895CCDAE207C935200E98D95 /* FunctionTests.swift in Sources */,
+				894FA6F0207CAC5300DC5DBE /* PredicateTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -371,6 +437,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				895CCDE6207C955700E98D95 /* Function.swift in Sources */,
+				894FA6F4207CAEAD00DC5DBE /* Sequence.swift in Sources */,
+				895CCDF0207CA35900E98D95 /* Provider.swift in Sources */,
+				895CCDEB207CA2F800E98D95 /* Consumer.swift in Sources */,
+				895CCDF5207CA3EF00E98D95 /* Predicate.swift in Sources */,
+				893700FA207CB10F0028E244 /* Optional.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -378,6 +450,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				895CCDE7207C955700E98D95 /* Function.swift in Sources */,
+				894FA6F5207CAEAD00DC5DBE /* Sequence.swift in Sources */,
+				895CCDF1207CA35900E98D95 /* Provider.swift in Sources */,
+				895CCDEC207CA2F800E98D95 /* Consumer.swift in Sources */,
+				895CCDF6207CA3EF00E98D95 /* Predicate.swift in Sources */,
+				893700FB207CB10F0028E244 /* Optional.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,6 +463,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				895CCDE8207C955700E98D95 /* Function.swift in Sources */,
+				894FA6F6207CAEAD00DC5DBE /* Sequence.swift in Sources */,
+				895CCDF2207CA35900E98D95 /* Provider.swift in Sources */,
+				895CCDED207CA2F800E98D95 /* Consumer.swift in Sources */,
+				895CCDF7207CA3EF00E98D95 /* Predicate.swift in Sources */,
+				893700FC207CB10F0028E244 /* Optional.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -451,7 +535,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5Q5Q8W9ATZ;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -532,7 +616,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5Q5Q8W9ATZ;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -572,6 +656,7 @@
 		895CCDB5207C935200E98D95 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -644,6 +729,7 @@
 		895CCDB6207C935200E98D95 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -746,7 +832,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5Q5Q8W9ATZ;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -828,7 +914,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5Q5Q8W9ATZ;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -903,7 +989,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5Q5Q8W9ATZ;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -984,7 +1070,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5Q5Q8W9ATZ;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1060,7 +1146,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5Q5Q8W9ATZ;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1142,7 +1228,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 5Q5Q8W9ATZ;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
