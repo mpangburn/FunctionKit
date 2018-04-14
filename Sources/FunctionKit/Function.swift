@@ -66,11 +66,24 @@ extension Function {
 
 extension Function {
     /// Returns a getter function for the given key path.
-    /// - Parameter keyPath: The key path used to create the function.
+    /// - Parameter keyPath: The key path for which to produce the getter function.
     /// - Returns: A getter function for the given key path.
     public static func get(_ keyPath: KeyPath<Input, Output>) -> Function<Input, Output> {
         return .init { input in
             input[keyPath: keyPath]
+        }
+    }
+
+    /// Returns a setter function for the given key path.
+    /// - Parameter keyPath: The key path for which to produce the setter function.
+    /// - Returns: A setter function for the given key path.
+    public static func update(_ keyPath: WritableKeyPath<Output, Input>) -> Function<Function<Input, Input>, Function<Output, Output>> {
+        return .init { update in
+            .init { root in
+                var copy = root
+                copy[keyPath: keyPath] = update.call(with: root[keyPath: keyPath])
+                return copy
+            }
         }
     }
 }

@@ -36,11 +36,21 @@ class FunctionTests: XCTestCase {
         XCTAssert(allTens.elementsEqual(expected))
     }
 
-    func testKeyPath() {
+    func testKeyPathGet() {
         let getCount: Function<[String], Int> = .get(\.count)
         XCTAssertEqual(getCount.call(with: []), 0)
         XCTAssertEqual(getCount.call(with: ["a", "b", "c"]), 3)
         XCTAssertEqual(getCount.call(with: ["a", "b", "c", "d", "e"]), 5)
+    }
+
+    func testKeyPathUpdate() {
+        struct Person { var firstName: String }
+        let updateFirstName = Function.update(\Person.firstName)
+        let lowercaseFirstName = updateFirstName.call(with: .init { $0.lowercased() })
+        let michael = Person(firstName: "Michael")
+        let lauren = Person(firstName: "Lauren")
+        XCTAssertEqual(lowercaseFirstName.call(with: michael).firstName, "michael")
+        XCTAssertEqual(lowercaseFirstName.call(with: lauren).firstName, "lauren")
     }
 
     func testPipe() {
