@@ -13,7 +13,7 @@ internal func promote<Input, Output>(_ f: @escaping (Input) -> Output) -> Functi
 }
 
 /// A wrapper around a Swift function designed to provide powerful functional operations
-/// while maintaining clarity and discoverability.
+/// such as composition and currying.
 public final class Function<Input, Output> {
     /// The wrapped Swift function.
     /// This function is invoked with `call(with:)` for clarity.
@@ -59,6 +59,19 @@ extension Function {
     /// - Returns: A function that produces the same output regardless of its input.
     public static func constant<Value, Ignored>(_ value: Value) -> Function<Ignored, Value> {
         return .init { _ in value }
+    }
+}
+
+// MARK: - Key Path Compatibility
+
+extension Function {
+    /// Returns a getter function for the given key path.
+    /// - Parameter keyPath: The key path used to create the function.
+    /// - Returns: A getter function for the given key path.
+    public static func get(_ keyPath: KeyPath<Input, Output>) -> Function<Input, Output> {
+        return .init { input in
+            input[keyPath: keyPath]
+        }
     }
 }
 
@@ -237,37 +250,30 @@ extension Function where Input == Output {
         return .concatenation(call, other)
     }
 
-    /// Returns a new function that pipes the output of each function into the next, and so forth for all given functions.
+    /// Returns a function that pipes the output of each function into the next, and so forth for all given functions.
     ///
     /// Concatenation is forward composition restricted to functions whose input and output types are equal.
-    /// - Parameter functions: The functions to concatenate in order.
-    /// - Parameter finally: An optional function as a syntactic convenience for trailing closure syntax.
-    /// - Returns: A new function concatenating the given functions.
+    /// - Parameter functions: The functions to concatenate in sequence.
+    /// - Parameter finally: An optional function as a convenience for trailing closure syntax.
+    /// - Returns: A function concatenating the given functions.
     public static func concatenation(
         _ functions: Function<Input, Output>...,
         and finally: @escaping (Input) -> Output = { $0 }
     ) -> Function<Input, Output> {
-        return .concatenation(functions, and: finally)
+        return .concatenation(functions.map { $0.call }, and: finally)
     }
 
-    /// Returns a new function that pipes the output of each function into the next, and so forth for all given functions.
+    /// Returns a function that pipes the output of each function into the next, and so forth for all given functions.
     ///
     /// Concatenation is forward composition restricted to functions whose input and output types are equal.
-    /// - Parameter functions: The functions to concatenate in order.
-    /// - Parameter finally: An optional function as a syntactic convenience for trailing closure syntax.
-    /// - Returns: A new function concatenating the given functions.
+    /// - Parameter functions: The functions to concatenate in sequence.
+    /// - Parameter finally: An optional function as a convenience for trailing closure syntax.
+    /// - Returns: A function concatenating the given functions.
     public static func concatenation(
         _ functions: (Input) -> Output...,
         and finally: @escaping (Input) -> Output = { $0 }
     ) -> Function<Input, Output> {
         return .concatenation(functions, and: finally)
-    }
-
-    internal static func concatenation(
-        _ functions: [Function<Input, Output>],
-        and finally: @escaping (Input) -> Output
-    ) -> Function<Input, Output> {
-        return .concatenation(functions.map { $0.call }, and: finally)
     }
 
     internal static func concatenation(
@@ -1120,5 +1126,17 @@ extension Function {
             return .init { input in
                 .init(self.call(with: input))
             }
+    }
+}
+
+// MARK: - Function Conversion
+
+extension Function where Input == Output {
+    /// Converts this function to its `inout` equivalent by assigning the result of this function to the argument.
+    /// - Returns: This function converted to its `inout` equivalent.
+    public func toInout() -> InoutFunction<Input> {
+        return .init { input in
+            input = self.call(with: input)
+        }
     }
 }

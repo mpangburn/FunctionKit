@@ -36,6 +36,13 @@ class FunctionTests: XCTestCase {
         XCTAssert(allTens.elementsEqual(expected))
     }
 
+    func testKeyPath() {
+        let getCount: Function<[String], Int> = .get(\.count)
+        XCTAssertEqual(getCount.call(with: []), 0)
+        XCTAssertEqual(getCount.call(with: ["a", "b", "c"]), 3)
+        XCTAssertEqual(getCount.call(with: ["a", "b", "c", "d", "e"]), 5)
+    }
+
     func testPipe() {
         let numbers = 1...3
 
@@ -182,5 +189,15 @@ class FunctionTests: XCTestCase {
 
     func testPromotion() {
         let _: Function<Function<Int, Int>, Function<Int, Int>> = Function(funcInFuncOut).promotingInput().promotingOutput()
+    }
+
+    func testToInout() {
+        let inoutIncrement = Function(increment).toInout()
+        var x = 0
+        inoutIncrement.update(&x)
+        XCTAssertEqual(x, 1)
+        inoutIncrement.update(&x)
+        inoutIncrement.update(&x)
+        XCTAssertEqual(x, 3)
     }
 }
