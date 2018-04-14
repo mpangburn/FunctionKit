@@ -28,4 +28,10 @@ extension Sequence {
         let f = nextPartialResult.call
         return reduce(initialResult, f)
     }
+
+    public func sorted(by comparator: Comparator<Element>) -> [Element] {
+        return sorted { lhs, rhs in
+            comparator.compare(lhs, rhs) == .orderedAscending
+        }
+    }
 }

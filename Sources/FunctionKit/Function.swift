@@ -5,10 +5,10 @@
 //  Created by Michael Pangburn on 4/9/18.
 //
 
-/// An private helper function to promote a Swift function of type `(Input) -> Output` to a `Function<Input, Output>`.
+/// An internal helper function to promote a Swift function of type `(Input) -> Output` to a `Function<Input, Output>`.
 /// This is declared as a free function avoid the need to specify the `Function` input and output types
 /// when promoting a Swift function of different input/output types inside the `Function` class.
-private func promote<Input, Output>(_ f: @escaping (Input) -> Output) -> Function<Input, Output> {
+internal func promote<Input, Output>(_ f: @escaping (Input) -> Output) -> Function<Input, Output> {
     return Function(f)
 }
 
@@ -69,7 +69,7 @@ extension Function {
     ///
     /// This operation is known as forward function composition.
     /// - Parameter other: The function into which to pipe the output of this function.
-    /// - Returns: A new function that takes in a value of type `self.Input` and returns a value of type `other.Output`.
+    /// - Returns: A new function that pipes the output of this function into the given function.
     public func piping<C>(into other: Function<Output, C>) -> Function<Input, C> {
         return piping(into: other.call)
     }
@@ -78,7 +78,7 @@ extension Function {
     ///
     /// This operation is known as forward function composition.
     /// - Parameter other: The function into which to pipe the output of this function.
-    /// - Returns: A new function that takes in a value of type "`self.Input`" and returns a value of type "`other.Output`".
+    /// - Returns: A new function that pipes the output of this function into the given function.
     public func piping<C>(into other: @escaping (Output) -> C) -> Function<Input, C> {
         return .init { input in
             other(self.call(with: input))
