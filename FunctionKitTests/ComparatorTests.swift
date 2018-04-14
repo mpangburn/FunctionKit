@@ -16,6 +16,11 @@ private struct Person: Equatable {
     let age: Int
 }
 
+private struct User: Equatable {
+    let name: String
+    let email: String?
+}
+
 class ComparatorTests: XCTestCase {
     private let mp = Person(firstName: "Michael", lastName: "Pangburn", age: 20)
     private let mj = Person(firstName: "Michael", lastName: "Jordan", age: 55)
@@ -23,6 +28,13 @@ class ComparatorTests: XCTestCase {
     private let bb = Person(firstName: "Bo", lastName: "Burnham", age: 27)
 
     private lazy var people = [mp, mj, ab, bb]
+
+    private let m_f = User(name: "Michael", email: "f@not.real")
+    private let s_a = User(name: "Shirley", email: "a@not.real")
+    private let f_nil = User(name: "Jeff", email: nil)
+    private let a_nil = User(name: "Abed", email: nil)
+
+    private lazy var users = [m_f, s_a, f_nil, a_nil]
 
     func testComparatorComparable() {
         let numbers = [3, 2, 5, 4, 1]
@@ -44,5 +56,20 @@ class ComparatorTests: XCTestCase {
         let firstNameThenAgeComparator = firstNameComparator.thenComparing(by: { $0.age })
         XCTAssertEqual(people.sorted(by: firstNameThenAgeComparator), [ab, bb, mp, mj])
         XCTAssertEqual(people.sorted(by: firstNameThenAgeComparator.reversed()), [ab, bb, mp, mj].reversed())
+    }
+
+    func testComparatorOptional() {
+        let nilEmailsFirst: Comparator<User> = .nilValuesFirst(by: { $0.email })
+        let usersByNilEmailsFirst = users.sorted(by: nilEmailsFirst)
+        // standard lib sort is not a stable sort
+        XCTAssert(usersByNilEmailsFirst == [f_nil, a_nil, s_a, m_f] || usersByNilEmailsFirst == [a_nil, f_nil, s_a, m_f])
+
+        let nilEmailsLast: Comparator<User> = .nilValuesLast(by: { $0.email })
+        let usersByNilEmailsLast = users.sorted(by: nilEmailsLast)
+        // standard lib sort is not a stable sort
+        XCTAssert(usersByNilEmailsLast == [s_a, m_f, f_nil, a_nil] || usersByNilEmailsLast == [s_a, m_f, a_nil, f_nil])
+
+        let nilEmailsLastThenByName = nilEmailsLast.thenComparing(by: { $0.name })
+        XCTAssertEqual(users.sorted(by: nilEmailsLastThenByName), [s_a, m_f, a_nil, f_nil])
     }
 }

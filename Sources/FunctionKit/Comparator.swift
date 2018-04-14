@@ -49,7 +49,8 @@ extension Function where Output == ComparisonResult {
     /// - Parameter comparableProvider: A function providing a `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function.
     public static func comparing<T, Value: Comparable>(by comparableProvider: Function<T, Value>) -> Comparator<T> where Input == (T, T) {
-        return Comparator<Value>.naturalOrder().composing { (comparableProvider.call(with: $0), comparableProvider.call(with: $1)) }
+        return Comparator<Value>.naturalOrder()
+            .composing(with: { (comparableProvider.call(with: $0), comparableProvider.call(with: $1)) })
     }
 
     /// Returns a comparator that compares by extracting a `Comparable` key using the given function.
@@ -99,5 +100,89 @@ extension Function where Output == ComparisonResult {
                 return .orderedAscending
             }
         }
+    }
+}
+
+// MARK: - Optional Comparators
+
+extension Function where Output == ComparisonResult {
+    /// Returns an optional-friendly comparator that orders `nil` values before non-`nil` values.
+    public static func nilValuesFirst<T: Comparable>() -> Comparator<T?> where Input == (T?, T?) {
+        return .nilValuesFirst(by: .naturalOrder())
+    }
+
+    /// Returns an optional-friendly comparator that orders `nil` values before non-`nil` values.
+    /// - Parameter comparator: The comparator to use in cases where both values are non-`nil`.
+    /// - Returns: An optional-friendly comparator that orders `nil` values before non-`nil` values.
+    public static func nilValuesFirst<T>(by comparator: Comparator<T>) -> Comparator<T?> where Input == (T?, T?) {
+        return .init { lhs, rhs in
+            switch (lhs, rhs) {
+            case (nil, nil):
+                return .orderedSame
+            case (nil, _):
+                return .orderedAscending
+            case (_, nil):
+                return .orderedDescending
+            case (let lhs?, let rhs?):
+                return comparator.compare(lhs, rhs)
+            }
+        }
+    }
+
+    /// Returns an optional-friendly comparator that compares by extracting a an optional `Comparable` key using the given function,
+    /// ordering `nil` values before non-`nil` values.
+    /// - Parameter optionalComparableProvider: A function providing an optional `Comparable` value by which to compare.
+    /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values before non-`nil` values.
+    public static func nilValuesFirst<T, Value: Comparable>(by optionalComparableProvider: Function<T, Value?>) -> Comparator<T> where Input == (T, T) {
+        return Comparator<Value?>.nilValuesFirst()
+            .composing(with: { (optionalComparableProvider.call(with: $0), optionalComparableProvider.call(with: $1)) })
+    }
+
+    /// Returns an optional-friendly comparator that compares by extracting a an optional `Comparable` key using the given function,
+    /// ordering `nil` values before non-`nil` values.
+    /// - Parameter optionalComparableProvider: A function providing an optional `Comparable` value by which to compare.
+    /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values before non-`nil` values.
+    public static func nilValuesFirst<T, Value: Comparable>(by optionalComparableProvider: @escaping (T) -> Value?) -> Comparator<T> where Input == (T, T) {
+        return .nilValuesFirst(by: .init(optionalComparableProvider))
+    }
+
+    /// Returns an optional-friendly comparator that orders `nil` values after non-`nil` values.
+    public static func nilValuesLast<T: Comparable>() -> Comparator<T?> where Input == (T?, T?) {
+        return .nilValuesLast(by: .naturalOrder())
+    }
+
+    /// Returns an optional-friendly comparator that orders `nil` values after non-`nil` values.
+    /// - Parameter comparator: The comparator to use in cases where both values are non-`nil`.
+    /// - Returns: An optional-friendly comparator that orders `nil` values after non-`nil` values.
+    public static func nilValuesLast<T>(by comparator: Comparator<T>) -> Comparator<T?> where Input == (T?, T?) {
+        return .init { lhs, rhs in
+            switch (lhs, rhs) {
+            case (nil, nil):
+                return .orderedSame
+            case (nil, _):
+                return .orderedDescending
+            case (_, nil):
+                return .orderedAscending
+            case (let lhs?, let rhs?):
+                return comparator.compare(lhs, rhs)
+            }
+        }
+    }
+
+    /// Returns an optional-friendly comparator that compares by extracting a an optional `Comparable` key using the given function,
+    /// ordering `nil` values after non-`nil` values.
+    /// - Parameter optionalComparableProvider: A function providing an optional `Comparable` value by which to compare.
+    /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values after non-`nil` values.
+    public static func nilValuesLast<T, Value: Comparable>(by optionalComparableProvider: Function<T, Value?>) -> Comparator<T> where Input == (T, T) {
+        return Comparator<Value?>.nilValuesLast()
+            .composing(with: { (optionalComparableProvider.call(with: $0), optionalComparableProvider.call(with: $1)) })
+    }
+
+    /// Returns an optional-friendly comparator that compares by extracting a an optional `Comparable` key using the given function,
+    /// ordering `nil` values after non-`nil` values.
+    /// - Parameter optionalComparableProvider: A function providing an optional `Comparable` value by which to compare.
+    /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values after non-`nil` values.
+    public static func nilValuesLast<T, Value: Comparable>(by optionalComparableProvider: @escaping (T) -> Value?) -> Comparator<T> where Input == (T, T) {
+        return .nilValuesLast(by: .init(optionalComparableProvider))
     }
 }

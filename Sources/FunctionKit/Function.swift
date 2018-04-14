@@ -77,6 +77,7 @@ extension Function {
     /// Returns a setter function for the given key path.
     /// - Parameter keyPath: The key path for which to produce the setter function.
     /// - Returns: A setter function for the given key path.
+    /// - Warning: Using this function with mutable reference types may yield unexpected results.
     public static func update(_ keyPath: WritableKeyPath<Output, Input>) -> Function<Function<Input, Input>, Function<Output, Output>> {
         return .init { update in
             .init { root in
@@ -1151,5 +1152,17 @@ extension Function where Input == Output {
         return .init { input in
             input = self.call(with: input)
         }
+    }
+}
+
+// MARK: - Utilities
+
+extension Function {
+    /// Calls the function with the given input.
+    /// This is a convenience method to call a `Function` taking `Function` input with a Swift function.
+    /// - Parameter input: The input with which to call the function.
+    /// - Returns: The output of the function.
+    public func call<A, B>(with input: @escaping (A) -> B) -> Output where Input == Function<A, B> {
+        return call(with: .init(input))
     }
 }

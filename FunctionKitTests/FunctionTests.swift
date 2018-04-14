@@ -46,11 +46,18 @@ class FunctionTests: XCTestCase {
     func testKeyPathUpdate() {
         struct Person { var firstName: String }
         let updateFirstName = Function.update(\Person.firstName)
-        let lowercaseFirstName = updateFirstName.call(with: .init { $0.lowercased() })
+        let lowercaseFirstName = updateFirstName.call(with: { $0.lowercased() })
         let michael = Person(firstName: "Michael")
         let lauren = Person(firstName: "Lauren")
         XCTAssertEqual(lowercaseFirstName.call(with: michael).firstName, "michael")
         XCTAssertEqual(lowercaseFirstName.call(with: lauren).firstName, "lauren")
+
+        class PersonReference { var firstName: String; init(firstName: String) { self.firstName = firstName } }
+        let updateFirstNameReference = Function.update(\PersonReference.firstName)
+        let lowercaseFirstNameReference = updateFirstNameReference.call(with: .init { $0.lowercased() })
+        let miguel = PersonReference(firstName: "Miguel")
+        _ = lowercaseFirstNameReference.call(with: miguel)
+        XCTAssertEqual(miguel.firstName, "miguel")
     }
 
     func testPipe() {
