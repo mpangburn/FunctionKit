@@ -40,18 +40,18 @@ extension Function where Output == ComparisonResult {
     }
 
     /// Returns a comparator that compares by extracting a `Comparable` value using the given function.
-    /// - Parameter comparableProvider: A function providing a `Comparable` value by which to compare.
+    /// - Parameter comparableExtractor: A function providing a `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function.
-    public static func comparing<T, Value: Comparable>(by comparableProvider: Function<T, Value>) -> Comparator<T> where Input == (T, T) {
+    public static func comparing<T, Value: Comparable>(by comparableExtractor: Function<T, Value>) -> Comparator<T> where Input == (T, T) {
         return Comparator<Value>.naturalOrder()
-            .composing(with: { (comparableProvider.call(with: $0), comparableProvider.call(with: $1)) })
+            .composing(with: { (comparableExtractor.call(with: $0), comparableExtractor.call(with: $1)) })
     }
 
     /// Returns a comparator that compares by extracting a `Comparable` value using the given function.
-    /// - Parameter comparableProvider: A function providing a `Comparable` value by which to compare.
+    /// - Parameter comparableExtractor: A function providing a `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function.
-    public static func comparing<T, Value: Comparable>(by comparableProvider: @escaping (T) -> Value) -> Comparator<T> where Input == (T, T) {
-        return comparing(by: .init(comparableProvider))
+    public static func comparing<T, Value: Comparable>(by comparableExtractor: @escaping (T) -> Value) -> Comparator<T> where Input == (T, T) {
+        return comparing(by: .init(comparableExtractor))
     }
 }
 
@@ -100,14 +100,22 @@ extension Function where Output == ComparisonResult {
         return .sequence(self, nextComparator)
     }
 
-
-    public func thenComparing<T, Value: Comparable>(by comparableProvider: Function<T, Value>) -> Comparator<T> where Input == (T, T) {
-        return .sequence(self, .comparing(by: comparableProvider))
+    /// Returns a new comparator that first compares using this comparator, then by the value extracted
+    /// using the given function in the case where operands are ordered the same.
+    /// - Parameter comparableExtractor: The function to extract the value to compare by
+    ///                                  in the case where this comparator determines the operands are ordered the same.
+    /// - Returns: A new comparator using the given value extractor to secondarily compare.
+    public func thenComparing<T, Value: Comparable>(by comparableExtractor: Function<T, Value>) -> Comparator<T> where Input == (T, T) {
+        return .sequence(self, .comparing(by: comparableExtractor))
     }
 
-
-    public func thenComparing<T, Value: Comparable>(by comparableProvider: @escaping (T) -> Value) -> Comparator<T> where Input == (T, T) {
-        return .sequence(self, .comparing(by: comparableProvider))
+    /// Returns a new comparator that first compares using this comparator, then by the value extracted
+    /// using the given function in the case where operands are ordered the same.
+    /// - Parameter comparableExtractor: The function to extract the value to compare by
+    ///                                  in the case where this comparator determines the operands are ordered the same.
+    /// - Returns: A new comparator using the given value extractor to secondarily compare.
+    public func thenComparing<T, Value: Comparable>(by comparableExtractor: @escaping (T) -> Value) -> Comparator<T> where Input == (T, T) {
+        return .sequence(self, .comparing(by: comparableExtractor))
     }
 
     /// Returns a comparator that imposes the reverse ordering of this comparator.
@@ -153,19 +161,19 @@ extension Function where Output == ComparisonResult {
 
     /// Returns an optional-friendly comparator that compares by extracting a an optional `Comparable` key using the given function,
     /// ordering `nil` values before non-`nil` values.
-    /// - Parameter optionalComparableProvider: A function providing an optional `Comparable` value by which to compare.
+    /// - Parameter optionalComparableExtractor: A function providing an optional `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values before non-`nil` values.
-    public static func nilValuesFirst<T, Value: Comparable>(by optionalComparableProvider: Function<T, Value?>) -> Comparator<T> where Input == (T, T) {
+    public static func nilValuesFirst<T, Value: Comparable>(by optionalComparableExtractor: Function<T, Value?>) -> Comparator<T> where Input == (T, T) {
         return Comparator<Value?>.nilValuesFirst()
-            .composing(with: { (optionalComparableProvider.call(with: $0), optionalComparableProvider.call(with: $1)) })
+            .composing(with: { (optionalComparableExtractor.call(with: $0), optionalComparableExtractor.call(with: $1)) })
     }
 
     /// Returns an optional-friendly comparator that compares by extracting a an optional `Comparable` key using the given function,
     /// ordering `nil` values before non-`nil` values.
-    /// - Parameter optionalComparableProvider: A function providing an optional `Comparable` value by which to compare.
+    /// - Parameter optionalComparableExtractor: A function providing an optional `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values before non-`nil` values.
-    public static func nilValuesFirst<T, Value: Comparable>(by optionalComparableProvider: @escaping (T) -> Value?) -> Comparator<T> where Input == (T, T) {
-        return .nilValuesFirst(by: .init(optionalComparableProvider))
+    public static func nilValuesFirst<T, Value: Comparable>(by optionalComparableExtractor: @escaping (T) -> Value?) -> Comparator<T> where Input == (T, T) {
+        return .nilValuesFirst(by: .init(optionalComparableExtractor))
     }
 
     /// Returns an optional-friendly comparator that orders `nil` values after non-`nil` values.
@@ -193,18 +201,18 @@ extension Function where Output == ComparisonResult {
 
     /// Returns an optional-friendly comparator that compares by extracting a an optional `Comparable` key using the given function,
     /// ordering `nil` values after non-`nil` values.
-    /// - Parameter optionalComparableProvider: A function providing an optional `Comparable` value by which to compare.
+    /// - Parameter optionalComparableExtractor: A function providing an optional `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values after non-`nil` values.
-    public static func nilValuesLast<T, Value: Comparable>(by optionalComparableProvider: Function<T, Value?>) -> Comparator<T> where Input == (T, T) {
+    public static func nilValuesLast<T, Value: Comparable>(by optionalComparableExtractor: Function<T, Value?>) -> Comparator<T> where Input == (T, T) {
         return Comparator<Value?>.nilValuesLast()
-            .composing(with: { (optionalComparableProvider.call(with: $0), optionalComparableProvider.call(with: $1)) })
+            .composing(with: { (optionalComparableExtractor.call(with: $0), optionalComparableExtractor.call(with: $1)) })
     }
 
     /// Returns an optional-friendly comparator that compares by extracting a an optional `Comparable` key using the given function,
     /// ordering `nil` values after non-`nil` values.
-    /// - Parameter optionalComparableProvider: A function providing an optional `Comparable` value by which to compare.
+    /// - Parameter optionalComparableExtractor: A function providing an optional `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values after non-`nil` values.
-    public static func nilValuesLast<T, Value: Comparable>(by optionalComparableProvider: @escaping (T) -> Value?) -> Comparator<T> where Input == (T, T) {
-        return .nilValuesLast(by: .init(optionalComparableProvider))
+    public static func nilValuesLast<T, Value: Comparable>(by optionalComparableExtractor: @escaping (T) -> Value?) -> Comparator<T> where Input == (T, T) {
+        return .nilValuesLast(by: .init(optionalComparableExtractor))
     }
 }
