@@ -9,14 +9,23 @@
 public typealias Predicate<Input> = Function<Input, Bool>
 
 extension Function where Output == Bool {
-    // MARK: Logical negation
+    /// Evaluates the predicate with the given input.
+    ///
+    /// This function is an alias for `call(with: input)` for clarity of intent.
+    /// - Parameter input: The input to test.
+    /// - Returns: The evaluation of the predicate with the given input.
+    public func test(_ input: Input) -> Bool {
+        return call(with: input)
+    }
+
+    // MARK: Logical Negation
 
     /// Returns a new predicate that negates the result of this predicate.
     /// - Returns: A new predicate that negates the result of this predicate.
     /// - Note: The prefix `!` operator can also be used to the effect of this function.
     public func negated() -> Predicate<Input> {
         return .init { input in
-            !self.call(with: input)
+            !self.test(input)
         }
     }
 
@@ -26,15 +35,41 @@ extension Function where Output == Bool {
         return predicate.negated()
     }
 
-    // MARK: - Logical conjunction
+    // MARK: - Logical Conjunction
 
-    /// Returns a new predicate that returns `true` only if the input passes the test of both predicates.
-    /// - Parameter other: The other predicate to test.
-    /// - Returns: A new predicate that returns `true` only if the input passes the test of both predicates.
-    /// - Note: The infix `&&` operator can also be used to the effect of this function.
-    public func and(_ other: Predicate<Input>) -> Predicate<Input> {
+    /// Creates a new predicate that returns `true` only when all of the given predicates return `true`.
+    /// - Parameter predicates: The predicates to use in evaluating input.
+    /// - Parameter finalPredicate: An optional final predicate as a convenience for trailing closure syntax.
+    /// - Returns: A new predicate that returns `true` only when all of the given predicates return `true`.
+    public static func all(
+        _ predicates: Predicate<Input>...,
+        and finalPredicate: @escaping (Input) -> Bool = { _ in true }
+    ) -> Predicate<Input> {
+        return .all(predicates.map { $0.test }, and: finalPredicate)
+    }
+
+    /// Creates a new predicate that returns `true` only when all of the given predicates return `true`.
+    /// - Parameter predicates: The predicates to use in evaluating input.
+    /// - Parameter finalPredicate: An optional final predicate as a convenience for trailing closure syntax.
+    /// - Returns: A new predicate that returns `true` only when all of the given predicates return `true`.
+    public static func all(
+        _ predicates: (Input) -> Bool...,
+        and finalPredicate: @escaping (Input) -> Bool = { _ in true }
+    ) -> Predicate<Input> {
+        return .all(predicates, and: finalPredicate)
+    }
+
+    internal static func all(
+        _ predicates: [(Input) -> Bool],
+        and finalPredicate: @escaping (Input) -> Bool
+        ) -> Predicate<Input> {
         return .init { input in
-            self.call(with: input) && other.call(with: input)
+            for predicate in predicates {
+                guard predicate(input) else {
+                    return false
+                }
+            }
+            return finalPredicate(input)
         }
     }
 
@@ -42,18 +77,46 @@ extension Function where Output == Bool {
     /// - Parameter other: The other predicate to test.
     /// - Returns: A new predicate that returns `true` only if the input passes the test of both predicates.
     public static func && (lhs: Predicate<Input>, rhs: Predicate<Input>) -> Predicate<Input> {
-        return lhs.and(rhs)
+        return .init { input in
+            lhs.test(input) && rhs.test(input)
+        }
     }
 
-    // MARK: - Logical disjunction
+    // MARK: - Logical Disjunction
 
-    /// Returns a new predicate that returns `true` if the input passes the test of either predicate.
-    /// - Parameter other: The other predicate to test.
-    /// - Returns: A new predicate that returns `true` if the input passes the test of either predicate.
-    /// - Note: The infix `||` operator can also be used to the effect of this function.
-    public func or(_ other: Predicate<Input>) -> Predicate<Input> {
+    /// Creates a new predicate that returns `true` when any of the given predicates returns `true`.
+    /// - Parameter predicates: The predicates to use in evaluating input.
+    /// - Parameter finalPredicate: An optional final predicate as a convenience for trailing closure syntax.
+    /// - Returns: A new predicate that returns `true` when any of the given predicates returns `true`.
+    public static func any(
+        _ predicates: Predicate<Input>...,
+        and finalPredicate: @escaping (Input) -> Bool = { _ in false }
+    ) -> Predicate<Input> {
+        return .any(predicates.map { $0.test }, and: finalPredicate)
+    }
+
+    /// Creates a new predicate that returns `true` when any of the given predicates returns `true`.
+    /// - Parameter predicates: The predicates to use in evaluating input.
+    /// - Parameter finalPredicate: An optional final predicate as a convenience for trailing closure syntax.
+    /// - Returns: A new predicate that returns `true` when any of the given predicates returns `true`.
+    public static func any(
+        _ predicates: (Input) -> Bool...,
+        and finalPredicate: @escaping (Input) -> Bool = { _ in false }
+    ) -> Predicate<Input> {
+        return .any(predicates, and: finalPredicate)
+    }
+
+    internal static func any(
+        _ predicates: [(Input) -> Bool],
+        and finalPredicate: @escaping (Input) -> Bool
+    ) -> Predicate<Input> {
         return .init { input in
-            self.call(with: input) || other.call(with: input)
+            for predicate in predicates {
+                if predicate(input) {
+                    return true
+                }
+            }
+            return finalPredicate(input)
         }
     }
 
@@ -61,7 +124,9 @@ extension Function where Output == Bool {
     /// - Parameter other: The other predicate to test.
     /// - Returns: A new predicate that returns `true` if the input passes the test of either predicate.
     public static func || (lhs: Predicate<Input>, rhs: Predicate<Input>) -> Predicate<Input> {
-        return lhs.or(rhs)
+        return .init { input in
+            lhs.test(input) || rhs.test(input)
+        }
     }
 }
 
@@ -110,5 +175,19 @@ extension Function where Input: Comparable, Output == Bool {
     /// - Returns: A predicate that returns `true` the input is greater than or equal to `input`.
     public static func isGreaterThanOrEqualTo(_ input: Input) -> Predicate<Input> {
         return .init { $0 >= input }
+    }
+
+    /// Returns a predicate that returns `true` when the input lies in the given range.
+    /// - Parameter range: The half-open range in which to check for containment.
+    /// - Returns: A predicate that returns `true` when the input lies in the given range.
+    public static func isInRange(_ range: Range<Input>) -> Predicate<Input> {
+        return .init { range ~= $0 }
+    }
+
+    /// Returns a predicate that returns `true` when the input lies in the given range.
+    /// - Parameter range: The closed range in which to check for containment.
+    /// - Returns: A predicate that returns `true` when the input lies in the given range.
+    public static func isInRange(_ range: ClosedRange<Input>) -> Predicate<Input> {
+        return .init { range ~= $0 }
     }
 }
