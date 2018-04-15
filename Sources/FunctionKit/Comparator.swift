@@ -66,13 +66,35 @@ extension Function where Output == ComparisonResult {
     /// - Parameter comparators: The comparators to sequence.
     /// - Parameter finalComparator: An optional final comparator as a convenience for trailing closure syntax.
     /// - Returns: A comparator created by sequencing the given comparators.
-    public static func sequence<T>(_
-        comparators: Comparator<T>...,
+    public static func sequence<T>(
+        _ comparators: Comparator<T>...,
         and finalComparator: @escaping (T, T) -> ComparisonResult = { _, _ in .orderedSame}
+    ) -> Comparator<T> where Input == (T, T) {
+        return .sequence(comparators.map { $0.compare }, and: finalComparator)
+    }
+
+    /// Creates a comparator by sequencing the given comparators
+    /// where the next comparator in sequence is used if the operands are ordered the same by the previous.
+    ///
+    /// As soon as a comparator in the sequence determines that the operands are not ordered the same,
+    /// its result is returned.
+    /// - Parameter comparators: The comparators to sequence.
+    /// - Parameter finalComparator: An optional final comparator as a convenience for trailing closure syntax.
+    /// - Returns: A comparator created by sequencing the given comparators.
+    public static func sequence<T>(
+        _ comparators: (T, T) -> ComparisonResult...,
+        and finalComparator: @escaping (T, T) -> ComparisonResult = { _, _ in .orderedSame}
+    ) -> Comparator<T> where Input == (T, T) {
+        return .sequence(comparators, and: finalComparator)
+    }
+
+    internal static func sequence<T>(
+        _ comparators: [(T, T) -> ComparisonResult],
+        and finalComparator: @escaping (T, T) -> ComparisonResult
     ) -> Comparator<T> where Input == (T, T) {
         return .init { lhs, rhs in
             for comparator in comparators {
-                let result = comparator.compare(lhs, rhs)
+                let result = comparator(lhs, rhs)
                 if result != .orderedSame {
                     return result
                 }

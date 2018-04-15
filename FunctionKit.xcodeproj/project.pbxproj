@@ -194,8 +194,8 @@
 			children = (
 				89EF979F20815D2500AD302A /* Comparator.swift */,
 				895CCDE9207CA2F800E98D95 /* Consumer.swift */,
-				89EF97AD2081DEE200AD302A /* InoutFunction.swift */,
 				895CCDE4207C955700E98D95 /* Function.swift */,
+				89EF97AD2081DEE200AD302A /* InoutFunction.swift */,
 				895CCDF3207CA3EF00E98D95 /* Predicate.swift */,
 				895CCDEE207CA35900E98D95 /* Provider.swift */,
 				894FA6F1207CAEA100DC5DBE /* Extensions */,
