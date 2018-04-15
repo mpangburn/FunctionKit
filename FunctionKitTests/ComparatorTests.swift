@@ -42,7 +42,7 @@ class ComparatorTests: XCTestCase {
         XCTAssertEqual(numbers.sorted(by: .reverseOrder()), [5, 4, 3, 2, 1])
     }
 
-    func testComparatorComposed() {
+    func testComparator() {
         let firstNameComparator: Comparator<Person> = .comparing(by: { $0.firstName })
         XCTAssertEqual(people.sorted(by: firstNameComparator), people.sorted { $0.firstName < $1.firstName })
 
@@ -56,6 +56,13 @@ class ComparatorTests: XCTestCase {
         let firstNameThenAgeComparator = firstNameComparator.thenComparing(by: { $0.age })
         XCTAssertEqual(people.sorted(by: firstNameThenAgeComparator), [ab, bb, mp, mj])
         XCTAssertEqual(people.sorted(by: firstNameThenAgeComparator.reversed()), [ab, bb, mp, mj].reversed())
+    }
+
+    func testComparatorSequenced() {
+        let firstLastAge: Comparator<Person> = .sequence(.comparing { $0.firstName }, .comparing { $0.lastName }, .comparing { $0.age })
+        let mpInOneYear = Person(firstName: "Michael", lastName: "Pangburn", age: 21)
+        let people = [mpInOneYear] + self.people
+        XCTAssertEqual(people.sorted(by: firstLastAge), [ab, bb, mj, mp, mpInOneYear])
     }
 
     func testComparatorOptional() {

@@ -22,15 +22,9 @@ fileprivate extension Comparable {
     }
 }
 
-extension Function where Output == ComparisonResult {
-    /// Compares the two arguments for order.
-    /// - Parameter lhs: The left argument to compare.
-    /// - Parameter rhs: The right argument to compare.
-    /// - Returns: The result of the comparison.
-    public func compare<T>(_ lhs: T, _ rhs: T) -> ComparisonResult where Input == (T, T) {
-        return call(with: (lhs, rhs))
-    }
+// MARK: - Static Methods
 
+extension Function where Output == ComparisonResult {
     /// Returns a comparator that compares `Comparable` instances in natural order.
     public static func naturalOrder<T: Comparable>() -> Comparator<T> where Input == (T, T) {
         return .init { lhs, rhs in
@@ -45,7 +39,7 @@ extension Function where Output == ComparisonResult {
         }
     }
 
-    /// Returns a comparator that compares by extracting a `Comparable` key using the given function.
+    /// Returns a comparator that compares by extracting a `Comparable` value using the given function.
     /// - Parameter comparableProvider: A function providing a `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function.
     public static func comparing<T, Value: Comparable>(by comparableProvider: Function<T, Value>) -> Comparator<T> where Input == (T, T) {
@@ -53,39 +47,67 @@ extension Function where Output == ComparisonResult {
             .composing(with: { (comparableProvider.call(with: $0), comparableProvider.call(with: $1)) })
     }
 
-    /// Returns a comparator that compares by extracting a `Comparable` key using the given function.
+    /// Returns a comparator that compares by extracting a `Comparable` value using the given function.
     /// - Parameter comparableProvider: A function providing a `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function.
     public static func comparing<T, Value: Comparable>(by comparableProvider: @escaping (T) -> Value) -> Comparator<T> where Input == (T, T) {
         return comparing(by: .init(comparableProvider))
+    }
+}
+
+// MARK: - Comparator Sequencing
+
+extension Function where Output == ComparisonResult {
+    /// Creates a comparator by sequencing the given comparators
+    /// where the next comparator in sequence is used if the operands are ordered the same by the previous.
+    ///
+    /// As soon as a comparator in the sequence determines that the operands are not ordered the same,
+    /// its result is returned.
+    /// - Parameter comparators: The comparators to sequence.
+    /// - Parameter finalComparator: An optional final comparator as a convenience for trailing closure syntax.
+    /// - Returns: A comparator created by sequencing the given comparators.
+    public static func sequence<T>(_
+        comparators: Comparator<T>...,
+        and finalComparator: @escaping (T, T) -> ComparisonResult = { _, _ in .orderedSame}
+    ) -> Comparator<T> where Input == (T, T) {
+        return .init { lhs, rhs in
+            for comparator in comparators {
+                let result = comparator.compare(lhs, rhs)
+                if result != .orderedSame {
+                    return result
+                }
+            }
+            return finalComparator(lhs, rhs)
+        }
+    }
+}
+
+// MARK: - Instance Methods
+
+extension Function where Output == ComparisonResult {
+    /// Compares the two arguments for order.
+    /// - Parameter lhs: The left argument to compare.
+    /// - Parameter rhs: The right argument to compare.
+    /// - Returns: The result of the comparison.
+    public func compare<T>(_ lhs: T, _ rhs: T) -> ComparisonResult where Input == (T, T) {
+        return call(with: (lhs, rhs))
     }
 
     /// Returns a new comparator that first compares using this comparator, then by the given comparator in the case where operands are ordered the same.
     /// - Parameter nextComparator: The comparator to use to compare in the case where this comparator determines the operands are ordered the same.
     /// - Returns: A new comparator using the given comparator to secondarily compare.
     public func thenComparing<T>(by nextComparator: Comparator<T>) -> Comparator<T> where Input == (T, T) {
-        return .init { lhs, rhs in
-            let primaryResult = self.compare(lhs, rhs)
-            if primaryResult == .orderedSame {
-                return nextComparator.compare(lhs, rhs)
-            } else {
-                return primaryResult
-            }
-        }
+        return .sequence(self, nextComparator)
     }
 
-    /// Returns a new comparator that first compares using this comparator, then by the given comparator in the case where operands are ordered the same.
-    /// - Parameter nextComparator: The comparator to use to compare in the case where this comparator determines the operands are ordered the same.
-    /// - Returns: A new comparator using the given comparator to secondarily compare.
+
     public func thenComparing<T, Value: Comparable>(by comparableProvider: Function<T, Value>) -> Comparator<T> where Input == (T, T) {
-        return thenComparing(by: .comparing(by: comparableProvider))
+        return .sequence(self, .comparing(by: comparableProvider))
     }
 
-    /// Returns a new comparator that first compares using this comparator, then by the given comparator in the case where operands are ordered the same.
-    /// - Parameter nextComparator: The comparator to use to compare in the case where this comparator determines the operands are ordered the same.
-    /// - Returns: A new comparator using the given comparator to secondarily compare.
+
     public func thenComparing<T, Value: Comparable>(by comparableProvider: @escaping (T) -> Value) -> Comparator<T> where Input == (T, T) {
-        return thenComparing(by: .comparing(by: comparableProvider))
+        return .sequence(self, .comparing(by: comparableProvider))
     }
 
     /// Returns a comparator that imposes the reverse ordering of this comparator.
@@ -103,7 +125,7 @@ extension Function where Output == ComparisonResult {
     }
 }
 
-// MARK: - Optional Comparators
+// MARK: - Optional Compatibility
 
 extension Function where Output == ComparisonResult {
     /// Returns an optional-friendly comparator that orders `nil` values before non-`nil` values.
