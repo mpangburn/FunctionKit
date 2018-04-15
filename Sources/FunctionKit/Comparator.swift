@@ -44,7 +44,7 @@ extension Function where Output == ComparisonResult {
     /// - Returns: A comparator that compares the values extracted using the given function.
     public static func comparing<T, Value: Comparable>(by comparableExtractor: Function<T, Value>) -> Comparator<T> where Input == (T, T) {
         return Comparator<Value>.naturalOrder()
-            .composing(with: { (comparableExtractor.call(with: $0), comparableExtractor.call(with: $1)) })
+            .composed(with: { (comparableExtractor.call(with: $0), comparableExtractor.call(with: $1)) })
     }
 
     /// Returns a comparator that compares by extracting a `Comparable` value using the given function.
@@ -187,7 +187,7 @@ extension Function where Output == ComparisonResult {
     /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values before non-`nil` values.
     public static func nilValuesFirst<T, Value: Comparable>(by optionalComparableExtractor: Function<T, Value?>) -> Comparator<T> where Input == (T, T) {
         return Comparator<Value?>.nilValuesFirst()
-            .composing(with: { (optionalComparableExtractor.call(with: $0), optionalComparableExtractor.call(with: $1)) })
+            .composed(with: { (optionalComparableExtractor.call(with: $0), optionalComparableExtractor.call(with: $1)) })
     }
 
     /// Returns an optional-friendly comparator that compares by extracting a an optional `Comparable` key using the given function,
@@ -227,7 +227,7 @@ extension Function where Output == ComparisonResult {
     /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values after non-`nil` values.
     public static func nilValuesLast<T, Value: Comparable>(by optionalComparableExtractor: Function<T, Value?>) -> Comparator<T> where Input == (T, T) {
         return Comparator<Value?>.nilValuesLast()
-            .composing(with: { (optionalComparableExtractor.call(with: $0), optionalComparableExtractor.call(with: $1)) })
+            .composed(with: { (optionalComparableExtractor.call(with: $0), optionalComparableExtractor.call(with: $1)) })
     }
 
     /// Returns an optional-friendly comparator that compares by extracting a an optional `Comparable` key using the given function,

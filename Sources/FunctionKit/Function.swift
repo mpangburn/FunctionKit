@@ -97,8 +97,8 @@ extension Function {
     /// This operation is known as forward function composition.
     /// - Parameter other: The function into which to pipe the output of this function.
     /// - Returns: A new function that pipes the output of this function into the given function.
-    public func piping<C>(into other: Function<Output, C>) -> Function<Input, C> {
-        return piping(into: other.call)
+    public func piped<C>(into other: Function<Output, C>) -> Function<Input, C> {
+        return piped(into: other.call)
     }
 
     /// Returns a new function that pipes the output of this function into another function.
@@ -106,7 +106,7 @@ extension Function {
     /// This operation is known as forward function composition.
     /// - Parameter other: The function into which to pipe the output of this function.
     /// - Returns: A new function that pipes the output of this function into the given function.
-    public func piping<C>(into other: @escaping (Output) -> C) -> Function<Input, C> {
+    public func piped<C>(into other: @escaping (Output) -> C) -> Function<Input, C> {
         return .init { input in
             other(self.call(with: input))
         }
@@ -120,7 +120,7 @@ extension Function {
         _ f: Function<Input, B>,
         _ g: Function<B, Output>
     ) -> Function<Input, Output> {
-        return f.piping(into: g)
+        return f.piped(into: g)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next.
@@ -131,7 +131,7 @@ extension Function {
         _ f: @escaping (Input) -> B,
         _ g: @escaping (B) -> Output
     ) -> Function<Input, Output> {
-        return promote(f).piping(into: g)
+        return promote(f).piped(into: g)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next.
@@ -143,7 +143,7 @@ extension Function {
         _ g: Function<B, C>,
         _ h: Function<C, Output>
     ) -> Function<Input, Output> {
-        return f.piping(into: g).piping(into: h)
+        return f.piped(into: g).piped(into: h)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next.
@@ -155,7 +155,7 @@ extension Function {
         _ g: @escaping (B) -> C,
         _ h: @escaping (C) -> Output
     ) -> Function<Input, Output> {
-        return promote(f).piping(into: g).piping(into: h)
+        return promote(f).piped(into: g).piped(into: h)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next.
@@ -168,7 +168,7 @@ extension Function {
         _ h: Function<C, D>,
         _ i: Function<D, Output>
     ) -> Function<Input, Output> {
-        return f.piping(into: g).piping(into: h).piping(into: i)
+        return f.piped(into: g).piped(into: h).piped(into: i)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next.
@@ -181,7 +181,7 @@ extension Function {
         _ h: @escaping (C) -> D,
         _ i: @escaping (D) -> Output
     ) -> Function<Input, Output> {
-        return promote(f).piping(into: g).piping(into: h).piping(into: i)
+        return promote(f).piped(into: g).piped(into: h).piped(into: i)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next.
@@ -195,7 +195,7 @@ extension Function {
         _ i: Function<D, E>,
         _ j: Function<E, Output>
     ) -> Function<Input, Output> {
-        return f.piping(into: g).piping(into: h).piping(into: i).piping(into: j)
+        return f.piped(into: g).piped(into: h).piped(into: i).piped(into: j)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next.
@@ -209,7 +209,7 @@ extension Function {
         _ i: @escaping (D) -> E,
         _ j: @escaping (E) -> Output
     ) -> Function<Input, Output> {
-        return promote(f).piping(into: g).piping(into: h).piping(into: i).piping(into: j)
+        return promote(f).piped(into: g).piped(into: h).piped(into: i).piped(into: j)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next.
@@ -224,7 +224,7 @@ extension Function {
         _ j: Function<E, F>,
         _ k: Function<F, Output>
     ) -> Function<Input, Output> {
-        return f.piping(into: g).piping(into: h).piping(into: i).piping(into: j).piping(into: k)
+        return f.piped(into: g).piped(into: h).piped(into: i).piped(into: j).piped(into: k)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next.
@@ -239,7 +239,7 @@ extension Function {
         _ j: @escaping (E) -> F,
         _ k: @escaping (F) -> Output
     ) -> Function<Input, Output> {
-        return promote(f).piping(into: g).piping(into: h).piping(into: i).piping(into: j).piping(into: k)
+        return promote(f).piped(into: g).piped(into: h).piped(into: i).piped(into: j).piped(into: k)
     }
 }
 
@@ -251,7 +251,7 @@ extension Function where Input == Output {
     /// Concatenation is forward composition restricted to functions whose input and output types are equal.
     /// - Parameter other: The function with which to concatenate.
     /// - Returns: A new function concatenating this function with the other.
-    public func concatenating(with other: Function<Input, Output>) -> Function<Input, Output> {
+    public func concatenated(with other: Function<Input, Output>) -> Function<Input, Output> {
         return .concatenation(self, other)
     }
 
@@ -260,7 +260,7 @@ extension Function where Input == Output {
     /// Concatenation is forward composition restricted to functions whose input and output types are equal.
     /// - Parameter other: The function with which to concatenate.
     /// - Returns: A new function concatenating this function with the other.
-    public func concatenating(with other: @escaping (Input) -> Output) -> Function<Input, Output> {
+    public func concatenated(with other: @escaping (Input) -> Output) -> Function<Input, Output> {
         return .concatenation(call, other)
     }
 
@@ -308,8 +308,8 @@ extension Function {
     /// Chaining is forward composition where the function output is piped forward only when not `nil`.
     /// - Parameter other: The function with which to chain.
     /// - Returns: A new function that pipes the output of this function into the next when not `nil`.
-    public func chaining<B, C>(with other: Function<B, C?>) -> Function<Input, C?> where Output == B? {
-        return chaining(with: other.call)
+    public func chained<B, C>(with other: Function<B, C?>) -> Function<Input, C?> where Output == B? {
+        return chained(with: other.call)
     }
 
     /// Returns a new function that pipes the output of this function into the next when not `nil`.
@@ -317,7 +317,7 @@ extension Function {
     /// Chaining is forward composition where the function output is piped forward only when not `nil`.
     /// - Parameter other: The function with which to chain.
     /// - Returns: A new function that pipes the output of this function into the next when not `nil`.
-    public func chaining<B, C>(with other: @escaping (B) -> C?) -> Function<Input, C?> where Output == B? {
+    public func chained<B, C>(with other: @escaping (B) -> C?) -> Function<Input, C?> where Output == B? {
         return .init { input in
             self.call(with: input).flatMap(other)
         }
@@ -332,7 +332,7 @@ extension Function {
         _ f: Function<Input, B?>,
         _ g: Function<B, C?>
     ) -> Function<Input, Output> where Output == C? {
-        return f.chaining(with: g)
+        return f.chained(with: g)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next when not `nil`.
@@ -344,7 +344,7 @@ extension Function {
         _ f: @escaping (Input) -> B?,
         _ g: @escaping (B) -> C?
     ) -> Function<Input, Output> where Output == C? {
-        return promote(f).chaining(with: g)
+        return promote(f).chained(with: g)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next when not `nil`.
@@ -357,7 +357,7 @@ extension Function {
         _ g: Function<B, C?>,
         _ h: Function<C, D?>
     ) -> Function<Input, Output> where Output == D? {
-        return f.chaining(with: g).chaining(with: h)
+        return f.chained(with: g).chained(with: h)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next when not `nil`.
@@ -370,7 +370,7 @@ extension Function {
         _ g: @escaping (B) -> C?,
         _ h: @escaping (C) -> D?
     ) -> Function<Input, Output> where Output == D? {
-        return promote(f).chaining(with: g).chaining(with: h)
+        return promote(f).chained(with: g).chained(with: h)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next when not `nil`.
@@ -384,7 +384,7 @@ extension Function {
         _ h: Function<C, D?>,
         _ i: Function<D, E?>
     ) -> Function<Input, Output> where Output == E? {
-        return f.chaining(with: g).chaining(with: h).chaining(with: i)
+        return f.chained(with: g).chained(with: h).chained(with: i)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next when not `nil`.
@@ -398,7 +398,7 @@ extension Function {
         _ h: @escaping (C) -> D?,
         _ i: @escaping (D) -> E?
     ) -> Function<Input, Output> where Output == E? {
-        return promote(f).chaining(with: g).chaining(with: h).chaining(with: i)
+        return promote(f).chained(with: g).chained(with: h).chained(with: i)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next when not `nil`.
@@ -413,7 +413,7 @@ extension Function {
         _ i: Function<D, E?>,
         _ j: Function<E, F?>
     ) -> Function<Input, Output> where Output == F? {
-        return f.chaining(with: g).chaining(with: h).chaining(with: i).chaining(with: j)
+        return f.chained(with: g).chained(with: h).chained(with: i).chained(with: j)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next when not `nil`.
@@ -428,7 +428,7 @@ extension Function {
         _ i: @escaping (D) -> E?,
         _ j: @escaping (E) -> F?
     ) -> Function<Input, Output> where Output == F? {
-        return promote(f).chaining(with: g).chaining(with: h).chaining(with: i).chaining(with: j)
+        return promote(f).chained(with: g).chained(with: h).chained(with: i).chained(with: j)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next when not `nil`.
@@ -444,7 +444,7 @@ extension Function {
         _ j: Function<E, F?>,
         _ k: Function<F, G?>
     ) -> Function<Input, Output> where Output == G? {
-        return f.chaining(with: g).chaining(with: h).chaining(with: i).chaining(with: j).chaining(with: k)
+        return f.chained(with: g).chained(with: h).chained(with: i).chained(with: j).chained(with: k)
     }
 
     /// Creates a pipeline of functions by using the output of each function as the input for the next when not `nil`.
@@ -460,7 +460,7 @@ extension Function {
         _ j: @escaping (E) -> F?,
         _ k: @escaping (F) -> G?
     ) -> Function<Input, Output> where Output == G? {
-        return promote(f).chaining(with: g).chaining(with: h).chaining(with: i).chaining(with: j).chaining(with: k)
+        return promote(f).chained(with: g).chained(with: h).chained(with: i).chained(with: j).chained(with: k)
     }
 }
 
@@ -472,8 +472,8 @@ extension Function {
     /// This operation is known as backward function composition.
     /// - Parameter other: The function with which to compose.
     /// - Returns: A new function that pipes the output of the given function into this function.
-    public func composing<A>(with other: Function<A, Input>) -> Function<A, Output> {
-        return composing(with: other.call)
+    public func composed<A>(with other: Function<A, Input>) -> Function<A, Output> {
+        return composed(with: other.call)
     }
 
     /// Returns a new function that pipes the output of the given function into this function.
@@ -481,7 +481,7 @@ extension Function {
     /// This operation is known as backward function composition.
     /// - Parameter other: The function with which to compose.
     /// - Returns: A new function that pipes the output of the given function into this function.
-    public func composing<A>(with other: @escaping (A) -> Input) -> Function<A, Output> {
+    public func composed<A>(with other: @escaping (A) -> Input) -> Function<A, Output> {
         return .init { a in
             self.call(with: other(a))
         }
@@ -495,7 +495,7 @@ extension Function {
         _ f: Function<B, Output>,
         _ g: Function<Input, B>
     ) -> Function<Input, Output> {
-        return f.composing(with: g)
+        return f.composed(with: g)
     }
 
     /// Creates a composition of functions by piping the output of each function into the previous.
@@ -506,7 +506,7 @@ extension Function {
         _ f: @escaping (B) -> Output,
         _ g: @escaping (Input) -> B
     ) -> Function<Input, Output> {
-        return promote(f).composing(with: g)
+        return promote(f).composed(with: g)
     }
 
     /// Creates a composition of functions by piping the output of each function into the previous.
@@ -518,7 +518,7 @@ extension Function {
         _ g: Function<B, C>,
         _ h: Function<Input, B>
     ) -> Function<Input, Output> {
-        return f.composing(with: g).composing(with: h)
+        return f.composed(with: g).composed(with: h)
     }
 
     /// Creates a composition of functions by piping the output of each function into the previous.
@@ -530,7 +530,7 @@ extension Function {
         _ g: @escaping (B) -> C,
         _ h: @escaping (Input) -> B
     ) -> Function<Input, Output> {
-        return promote(f).composing(with: g).composing(with: h)
+        return promote(f).composed(with: g).composed(with: h)
     }
 
     /// Creates a composition of functions by piping the output of each function into the previous.
@@ -543,7 +543,7 @@ extension Function {
         _ h: Function<B, C>,
         _ i: Function<Input, B>
     ) -> Function<Input, Output> {
-        return f.composing(with: g).composing(with: h).composing(with: i)
+        return f.composed(with: g).composed(with: h).composed(with: i)
     }
 
     /// Creates a composition of functions by piping the output of each function into the previous.
@@ -556,7 +556,7 @@ extension Function {
         _ h: @escaping (B) -> C,
         _ i: @escaping (Input) -> B
     ) -> Function<Input, Output> {
-        return promote(f).composing(with: g).composing(with: h).composing(with: i)
+        return promote(f).composed(with: g).composed(with: h).composed(with: i)
     }
 
     /// Creates a composition of functions by piping the output of each function into the previous.
@@ -570,7 +570,7 @@ extension Function {
         _ i: Function<B, C>,
         _ j: Function<Input, B>
     ) -> Function<Input, Output> {
-        return f.composing(with: g).composing(with: h).composing(with: i).composing(with: j)
+        return f.composed(with: g).composed(with: h).composed(with: i).composed(with: j)
     }
 
     /// Creates a composition of functions by piping the output of each function into the previous.
@@ -584,7 +584,7 @@ extension Function {
         _ i: @escaping (B) -> C,
         _ j: @escaping (Input) -> B
     ) -> Function<Input, Output> {
-        return promote(f).composing(with: g).composing(with: h).composing(with: i).composing(with: j)
+        return promote(f).composed(with: g).composed(with: h).composed(with: i).composed(with: j)
     }
 
     /// Creates a composition of functions by piping the output of each function into the previous.
@@ -599,7 +599,7 @@ extension Function {
         _ j: Function<B, C>,
         _ k: Function<Input, B>
     ) -> Function<Input, Output> {
-        return f.composing(with: g).composing(with: h).composing(with: i).composing(with: j).composing(with: k)
+        return f.composed(with: g).composed(with: h).composed(with: i).composed(with: j).composed(with: k)
     }
 
     /// Creates a composition of functions by piping the output of each function into the previous.
@@ -614,7 +614,7 @@ extension Function {
         _ j: @escaping (B) -> C,
         _ k: @escaping (Input) -> B
     ) -> Function<Input, Output> {
-        return promote(f).composing(with: g).composing(with: h).composing(with: i).composing(with: j).composing(with: k)
+        return promote(f).composed(with: g).composed(with: h).composed(with: i).composed(with: j).composed(with: k)
     }
 }
 

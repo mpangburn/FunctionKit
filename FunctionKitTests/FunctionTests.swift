@@ -64,9 +64,9 @@ class FunctionTests: XCTestCase {
         let numbers = 1...3
 
         let incrementAndSquares = [
-            Function(increment).piping(into: square),
-            Function(increment).piping { square($0) },
-            Function(increment).piping(into: .init(square)),
+            Function(increment).piped(into: square),
+            Function(increment).piped { square($0) },
+            Function(increment).piped(into: .init(square)),
             Function.pipeline(increment, square),
             Function.pipeline(.init(increment), .init(square))
         ]
@@ -91,7 +91,7 @@ class FunctionTests: XCTestCase {
         let numbers = 1...3
 
         let incrementAndSquares = [
-            Function(increment).concatenating(with: square),
+            Function(increment).concatenated(with: square),
             Function.concatenation(increment, square),
             Function.concatenation(Function(increment), Function(square))
         ]
@@ -100,7 +100,7 @@ class FunctionTests: XCTestCase {
         }
 
         let toTheEighthPowers = [
-            Function(square).concatenating { square(square($0)) },
+            Function(square).concatenated { square(square($0)) },
             Function.concatenation(square, square, square),
             Function.concatenation(square, square) { square($0) }
         ]
@@ -110,7 +110,7 @@ class FunctionTests: XCTestCase {
     }
 
     func testChainWithTypeConversion() {
-        let indexOfThumbsUpFromDataAndEncoding = Function(String.init(data:encoding:)).chaining(with: { $0.index(of: "👍") })
+        let indexOfThumbsUpFromDataAndEncoding = Function(String.init(data:encoding:)).chained(with: { $0.index(of: "👍") })
         let hasThumbsUp = "two thumbs up 👍👍 for this café"
         let hasThumbsUpData = hasThumbsUp.data(using: .utf8)!
         let doesNotHaveThumbsUpData = "👎".data(using: .utf8)!
@@ -142,9 +142,9 @@ class FunctionTests: XCTestCase {
         let numbers = 1...3
 
         let incrementAndSquares = [
-            Function(square).composing(with: increment),
-            Function(square).composing { increment($0) },
-            Function(square).composing(with: Function(increment)),
+            Function(square).composed(with: increment),
+            Function(square).composed { increment($0) },
+            Function(square).composed(with: Function(increment)),
             Function.composition(square, increment),
             Function.composition(Function(square), Function(increment))
         ]
