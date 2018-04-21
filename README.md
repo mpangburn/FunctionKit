@@ -1,6 +1,33 @@
 # FunctionKit
 
+[![Swift 4.1](https://img.shields.io/badge/Swift-4.1-orange.svg?style=flat)](#)
+[![Build Status](https://travis-ci.org/mpangburn/FunctionKit.svg?branch=master)](https://travis-ci.org/mpangburn/FunctionKit)
+[![MIT](https://img.shields.io/packagist/l/doctrine/orm.svg)](https://github.com/mpangburn/FunctionKit/blob/master/LICENSE)
+[![@pangburnout](https://img.shields.io/badge/contact-@pangburnout-blue.svg?style=flat)](https://twitter.com/pangburnout)
+
 A framework for functional types and operations designed to fit naturally into Swift.
+
+## Table of Contents
+
+- [**Background**](#background)
+- [**Goals**](#goals)
+- [**Usage**](#usage)
+    - [Functional Operations](#functional-operations)
+        - [Forward Composition](#forward-composition)
+        - [Concatenation](#concatenation)
+        - [Optional Chaining](#optional-chaining)
+        - [Backward Composition](#backward-composition)
+        - [Currying](#currying)
+        - [KeyPath Support](#keypath-support)
+    - [Special Function Types](#special-function-types)
+        - [`Consumer` and `Provider`](#consumer-and-provider)
+        - [`Predicate`](#predicate)
+        - [`Comparator`](#comparator)
+    - [Inout Functions](#inout-functions)
+    - [Throwing Functions](#throwing-functions)
+- [**Installation**](#installation)
+- [**References**](#references)
+- [**License**](#license)
 
 ## Background
 
@@ -19,8 +46,8 @@ Sometimes it's desirable to perform multiple operations on a sequence:
 ```swift
 let names = ["LAUREN  ", "michael", "JiM", "  Alison"]
 let sanitizedNames = names
-	.map(removeExtraWhitespace)
-	.map(capitalizeProperly)
+    .map(removeExtraWhitespace)
+    .map(capitalizeProperly)
 ```
 
 This seems nice, but we've introduced an inefficiency: in mapping over the array twice, we unnecessarily create an intermediate array. Here are a couple potential solutions:
@@ -399,6 +426,24 @@ Throwing functions will be supported in an upcoming update—check back soon!
 
 ## Installation
 
+### Carthage
+
+Add the following line to your Cartfile:
+
+`github "mpangburn/FunctionKit" ~> 0.1.0`
+
+### CocoaPods
+
+Add the following line to your Podfile:
+
+`pod 'FunctionKit', '~> 0.1.0'`
+
+### Swift Package Manager
+
+Add the following line to your Package.swift file:
+
+`.package(url: "https://github.com/mpangburn/FunctionKit", from: "0.1.0")`
+
 ## References
 
 - [pointfreeco/Overture](https://github.com/pointfreeco/swift-overture)
@@ -407,3 +452,5 @@ Throwing functions will be supported in an upcoming update—check back soon!
 - [Java Functional Interface Reference](https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html)
 
 ## License
+
+FunctionKit is released under the MIT license. See [LICENSE](https://github.com/mpangburn/FunctionKit/blob/master/LICENSE) for details.
