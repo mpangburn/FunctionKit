@@ -41,7 +41,7 @@ As powerful as Swift functions are, we unfortunately cannot write
 
 ```swift
 extension <A, B> (A) -> B {
-	// implement a method for all functions of form (A) -> B
+    // implement a method for all functions of form (A) -> B
 }
 ```
 
@@ -195,10 +195,10 @@ When partially applying a function, it can be helpful to flip the order of its a
 // In describing the steps below, standard Swift function notation will be used over `Function` type notation 
 // to demonstrate the operations performed more clearly.
 let utf8StringFromData =
-	Function(String.init(data:encoding:))	// (Data, String.Encoding) -> String?
-		.curried()							// (Data) -> (String.Encoding) -> String?
-		.flippingFirstTwoArguments()		// (String.Encoding) -> (Data) -> String?
-		.apply(.utf8)						// (Data) -> String?
+    Function(String.init(data:encoding:)) // (Data, String.Encoding) -> String?
+        .curried()                        // (Data) -> (String.Encoding) -> String?
+        .flippingFirstTwoArguments()      // (String.Encoding) -> (Data) -> String?
+        .apply(.utf8)	                  // (Data) -> String?
 ```
 
 While curried functions typically provide the most flexibility, it can be useful to uncurry a curried function. The process of uncurrying two arguments can be described as
@@ -208,9 +208,9 @@ While curried functions typically provide the most flexibility, it can be useful
 For example, using the `uncurried()` method, we can uncurry an unapplied method reference:
 
 ```swift
-let stringHasPrefix = String.hasPrefix							// (String) -> (String) -> Bool 
-let uncurriedHasPrefix = Function(stringHasPrefix).uncurried()	// Function<(String, String), Bool> 
-uncurriedHasPrefix.apply("function", "func") 					// true
+let stringHasPrefix = String.hasPrefix                         // (String) -> (String) -> Bool 
+let uncurriedHasPrefix = Function(stringHasPrefix).uncurried() // Function<(String, String), Bool> 
+uncurriedHasPrefix.apply("function", "func")                   // true
 ```
 
 **Note:** The behavior of unapplied method references may change if [SE-0042](https://github.com/apple/swift-evolution/blob/master/proposals/0042-flatten-method-types.md) is implemented.
@@ -232,8 +232,8 @@ struct Person {
 	var name: String
 }
 
-let updateName = Function.update(\Person.name)				// Function<Function<String, String>, Function<Person, Person>>
-let lowercaseName = updateName.apply { $0.lowercased() }	// Function<Person, Person>
+let updateName = Function.update(\Person.name)           // Function<Function<String, String>, Function<Person, Person>>
+let lowercaseName = updateName.apply { $0.lowercased() } // Function<Person, Person>
 let MICHAEL = Person(name: "MICHAEL")
 let michael = lowercaseName.apply(MICHAEL)
 // michael.name == "michael"
@@ -257,17 +257,17 @@ The `Consumer` type describes a function that produces no output, such as one th
 
 ```swift
 let handleError = Consumer<Error>
-	.init(presentError)
-	.then(analyticsManager.logError)
+    .init(presentError)
+    .then(analyticsManager.logError)
 ```
 
 The `Consumer` type is appropriate for use with mutable reference types:
 
 ```swift
 let configureLabel = Consumer<UILabel>
-	.init(stylizeFont)
-	.then { $0.numberOfLines = 0 }
-	.then(view.addSubview)
+    .init(stylizeFont)
+    .then { $0.numberOfLines = 0 }
+    .then(view.addSubview)
 	
 configureLabel.apply(detailLabel)
 ```
@@ -304,12 +304,12 @@ Because certain predicates are so common, additional static functions like `isEq
 
 ```swift
 let hasValidLength: Predicate<String> = Function
-	.get(\String.count)
-	.piped(into: .isInRange(4...12))
+    .get(\String.count)
+    .piped(into: .isInRange(4...12))
 
 let usesValidCharacters = Predicate<String>
-	.init { $0.contains(where: invalidCharacters.contains) }
-	.negated()
+    .init { $0.contains(where: invalidCharacters.contains) }
+    .negated()
 
 let isValidUsername = hasValidLength && usesValidCharacters
 ```
@@ -318,11 +318,11 @@ let isValidUsername = hasValidLength && usesValidCharacters
 
 ```swift
 let isOddPositiveMultipleOfThree: Predicate<Int> = 
-	.all(of:
-		{ $0 % 2 != 0 },
-		{ $0 > 0 },
-		{ $0 % 3 == 0 }
-	)
+    .all(of:
+        { $0 % 2 != 0 },
+        { $0 > 0 },
+        { $0 % 3 == 0 }
+    )
 	
 (-15...15).filter(isOddPositiveMultipleOfThree) // [3, 9, 15]
 ```
@@ -349,17 +349,17 @@ Once created, `Comparator` instances can be:
 
 ```swift
 struct User {
-	let id: Int
-	let signupDate: Date
-	let email: String?
+    let id: Int
+    let signupDate: Date
+    let email: String?
 }
 
 // Compares `User` instances, where
 // - emails are compared lexicographically, with `nil` values coming after non-`nil` values
 // - ties (i.e. two emails are the same, or both are `nil`) are broken by comparing the users' ids, with the lower id coming first.
 let userEmailThenId = Comparator<User>
-	.nilValuesLast(by: { $0.email })
-	.thenComparing(by: { $0.id })
+    .nilValuesLast(by: { $0.email })
+    .thenComparing(by: { $0.id })
 	
 let sortedUsers = users.sorted(by: userEmailThenId)
 ```
@@ -372,11 +372,11 @@ A `Comparator` on a type can be created from a sequence of `Comparator` instance
 // - if users signed up at the exact same time, their emails are compared lexicographically
 // - if users' emails are identical or both `nil`, the user with the lower id comes first
 let userSignupDateThenEmailThenId: Comparator<User> =
-	.sequence(
-		.comparing(by: { $0.signupDate }),
-		.nilValuesLast(by: { $0.email }),
-		.comparing(by: { $0.id })
-	)
+    .sequence(
+        .comparing(by: { $0.signupDate }),
+        .nilValuesLast(by: { $0.email }),
+        .comparing(by: { $0.id })
+    )
 ```
 
 ### Inout Functions
@@ -386,8 +386,8 @@ Functions of type `(inout A) -> Void` can be modeled with `InoutFunction`, a sep
 A `Function<A, A>` can be converted to an `InoutFunction<A>` with the `toInout()` method and back with the `withoutInout()` method:
 
 ```swift
-let increment = Function { (x: Int) in x + 1 }	// Function<Int, Int>
-let inoutIncrement = increment.toInout()		// InoutFunction<Int>
+let increment = Function { (x: Int) in x + 1 } // Function<Int, Int>
+let inoutIncrement = increment.toInout()       // InoutFunction<Int>
 var x = 1
 inoutIncrement.apply(&x) // x == 2
 inoutIncrement.apply(&x) // x == 3
