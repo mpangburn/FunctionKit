@@ -1,0 +1,8 @@
+language: objective-c
+osx_image: xcode9.3
+script:
+  - xcodebuild -project FunctionKit.xcodeproj -scheme FunctionKit-iOS -sdk iphonesimulator11.3 build -destination name="iPhone SE" test
+  - xcrun xcodebuild -project FunctionKit.xcodeproj -scheme FunctionKit-macOS
+  - xcrun xcodebuild -project FunctionKit.xcodeproj -scheme FunctionKit-watchOS
+  - xcrun xcodebuild -project FunctionKit.xcodeproj -scheme FunctionKit-tvOS
+  - swift build
