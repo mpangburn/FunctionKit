@@ -11,11 +11,11 @@ public typealias Predicate<Input> = Function<Input, Bool>
 extension Function where Output == Bool {
     /// Evaluates the predicate with the given input.
     ///
-    /// This function is an alias for `call(with: input)` for clarity of intent.
+    /// This function is an alias for `apply(_:)` for clarity of intent.
     /// - Parameter input: The input to test.
     /// - Returns: The evaluation of the predicate with the given input.
     public func test(_ input: Input) -> Bool {
-        return call(with: input)
+        return apply(input)
     }
 
     // MARK: Logical Negation
@@ -42,10 +42,10 @@ extension Function where Output == Bool {
     /// - Parameter finalPredicate: An optional final predicate as a convenience for trailing closure syntax.
     /// - Returns: A new predicate that returns `true` only when all of the given predicates return `true`.
     public static func all(
-        _ predicates: Predicate<Input>...,
+        of predicates: Predicate<Input>...,
         and finalPredicate: @escaping (Input) -> Bool = { _ in true }
     ) -> Predicate<Input> {
-        return .all(predicates.map { $0.test }, and: finalPredicate)
+        return .all(of: predicates.map { $0.test }, and: finalPredicate)
     }
 
     /// Creates a new predicate that returns `true` only when all of the given predicates return `true`.
@@ -53,14 +53,14 @@ extension Function where Output == Bool {
     /// - Parameter finalPredicate: An optional final predicate as a convenience for trailing closure syntax.
     /// - Returns: A new predicate that returns `true` only when all of the given predicates return `true`.
     public static func all(
-        _ predicates: (Input) -> Bool...,
+        of predicates: (Input) -> Bool...,
         and finalPredicate: @escaping (Input) -> Bool = { _ in true }
     ) -> Predicate<Input> {
-        return .all(predicates, and: finalPredicate)
+        return .all(of: predicates, and: finalPredicate)
     }
 
     internal static func all(
-        _ predicates: [(Input) -> Bool],
+        of predicates: [(Input) -> Bool],
         and finalPredicate: @escaping (Input) -> Bool
         ) -> Predicate<Input> {
         return .init { input in
@@ -89,10 +89,10 @@ extension Function where Output == Bool {
     /// - Parameter finalPredicate: An optional final predicate as a convenience for trailing closure syntax.
     /// - Returns: A new predicate that returns `true` when any of the given predicates returns `true`.
     public static func any(
-        _ predicates: Predicate<Input>...,
-        and finalPredicate: @escaping (Input) -> Bool = { _ in false }
+        of predicates: Predicate<Input>...,
+        or finalPredicate: @escaping (Input) -> Bool = { _ in false }
     ) -> Predicate<Input> {
-        return .any(predicates.map { $0.test }, and: finalPredicate)
+        return .any(of: predicates.map { $0.test }, or: finalPredicate)
     }
 
     /// Creates a new predicate that returns `true` when any of the given predicates returns `true`.
@@ -100,15 +100,15 @@ extension Function where Output == Bool {
     /// - Parameter finalPredicate: An optional final predicate as a convenience for trailing closure syntax.
     /// - Returns: A new predicate that returns `true` when any of the given predicates returns `true`.
     public static func any(
-        _ predicates: (Input) -> Bool...,
-        and finalPredicate: @escaping (Input) -> Bool = { _ in false }
+        of predicates: (Input) -> Bool...,
+        or finalPredicate: @escaping (Input) -> Bool = { _ in false }
     ) -> Predicate<Input> {
-        return .any(predicates, and: finalPredicate)
+        return .any(of: predicates, or: finalPredicate)
     }
 
     internal static func any(
-        _ predicates: [(Input) -> Bool],
-        and finalPredicate: @escaping (Input) -> Bool
+        of predicates: [(Input) -> Bool],
+        or finalPredicate: @escaping (Input) -> Bool
     ) -> Predicate<Input> {
         return .init { input in
             for predicate in predicates {
@@ -136,14 +136,14 @@ extension Function where Input: Equatable, Output == Bool {
     /// Returns a predicate that returns `true` the input is equal to `input`.
     /// - Parameter input: The input against which the equality test is made.
     /// - Returns: A predicate that returns `true` the input is equal to `input`.
-    public static func isEqual(to input: Input) -> Predicate<Input> {
+    public static func isEqualTo(_ input: Input) -> Predicate<Input> {
         return .init { $0 == input }
     }
 
     /// Returns a predicate that returns `true` the input is not equal to `input`.
     /// - Parameter input: The input against which the equality test is made.
     /// - Returns: A predicate that returns `true` the input is not equal to `input`.
-    public static func isNotEqual(to input: Input) -> Predicate<Input> {
+    public static func isNotEqualTo(_ input: Input) -> Predicate<Input> {
         return .init { $0 != input }
     }
 }

@@ -7,10 +7,10 @@
 
 extension Optional {
     public func map<T>(_ transform: Function<Wrapped, T>) -> T? {
-        return map(transform.call)
+        return map(transform.apply)
     }
 
     public func flatMap<T>(_ transform: Function<Wrapped, T?>) -> T? {
-        return flatMap(transform.call)
+        return flatMap(transform.apply)
     }
 }

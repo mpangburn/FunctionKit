@@ -22,7 +22,7 @@ class PredicateTests: XCTestCase {
 
     func testAll() {
         let numbers = -15...15
-        let isEvenPositiveMultipleOfThree: Predicate<Int> = .all(isEven, isPositive) { $0 % 3 == 0 }
+        let isEvenPositiveMultipleOfThree: Predicate<Int> = .all(of: isEven, isPositive) { $0 % 3 == 0 }
         XCTAssertEqual(numbers.filter(isEvenPositiveMultipleOfThree), [6, 12])
     }
 
@@ -34,7 +34,7 @@ class PredicateTests: XCTestCase {
 
     func testAny() {
         let numbers = -5...5
-        let isEvenOrPositiveOrMultipleOfThree: Predicate<Int> = .any(isEven, isPositive) { $0 % 3 == 0 }
+        let isEvenOrPositiveOrMultipleOfThree: Predicate<Int> = .any(of: isEven, isPositive) { $0 % 3 == 0 }
         XCTAssertEqual(numbers.filter(isEvenOrPositiveOrMultipleOfThree), [-4, -3, -2, 0, 1, 2, 3, 4, 5])
     }
 
@@ -46,10 +46,10 @@ class PredicateTests: XCTestCase {
 
     func testEquals() {
         let numbers = [1, 2, 3, 3, 3, 4, 5]
-        let justThrees = numbers.filter(.isEqual(to: 3))
+        let justThrees = numbers.filter(.isEqualTo(3))
         XCTAssertEqual(justThrees, [3, 3, 3])
 
-        let notThrees = numbers.filter(.isNotEqual(to: 3))
+        let notThrees = numbers.filter(.isNotEqualTo(3))
         XCTAssertEqual(notThrees, [1, 2, 4, 5])
     }
 

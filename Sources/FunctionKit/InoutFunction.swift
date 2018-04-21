@@ -9,24 +9,37 @@
 /// such as concatenation.
 public class InoutFunction<Input> {
     /// The wrapped Swift function.
-    private let _update: (inout Input) -> Void
+    private let _apply: (inout Input) -> Void
 
     /// Calls the function with the given input.
     /// - Parameter input: The input with which to call the function.
     /// - Note: Referencing this function as a member serves as a method to turn a `InoutFunction<Input>`
     ///         back into a Swift function of type `(inout Input) -> Void`.
-    public func update(_ input: inout Input) {
-        _update(&input)
+    public func apply(_ input: inout Input) {
+        _apply(&input)
     }
 
     /// Creates an `InoutFunction` from a Swift function.
     ///
     /// By promoting a Swift function to an `InoutFunction`, it gains access to functional operations
     /// such as concatenation.
-    /// - Parameter update: The Swift function to promote.
+    /// - Parameter f: The Swift function to promote.
     /// - Returns: The promoted function.
-    public init(_ update: @escaping (inout Input) -> Void) {
-        self._update = update
+    public init(_ f: @escaping (inout Input) -> Void) {
+        self._apply = f
+    }
+}
+
+extension InoutFunction {
+    /// Returns an inout-based setter function for the given key path.
+    /// - Parameter keyPath: The key path for which to produce the setter function.
+    /// - Returns: An inout-based setter function for the given key path.
+    public static func update<Root>(_ keyPath: WritableKeyPath<Root, Input>) -> Function<InoutFunction<Input>, InoutFunction<Root>> {
+        return .init { update in
+            .init { root in
+                update.apply(&root[keyPath: keyPath])
+            }
+        }
     }
 }
 
@@ -34,17 +47,17 @@ public class InoutFunction<Input> {
 
 extension InoutFunction {
     /// Returns a new function that applies this function followed by the given function.
-    /// - Parameter other: The additional update function to apply.
+    /// - Parameter other: The additional apply function to apply.
     /// - Returns: A new function that applies this function followed by the given function.
-    public func concatenating(with other: InoutFunction<Input>) -> InoutFunction<Input> {
+    public func concatenated(with other: InoutFunction<Input>) -> InoutFunction<Input> {
         return .concatenation(self, other)
     }
 
     /// Returns a new function that applies this function followed by the given function.
-    /// - Parameter other: The additional update function to apply.
+    /// - Parameter other: The additional apply function to apply.
     /// - Returns: A new function that applies this function followed by the given function.
-    public func concatenating(with other: @escaping (inout Input) -> Void) -> InoutFunction<Input> {
-        return .concatenation(update, other)
+    public func concatenated(with other: @escaping (inout Input) -> Void) -> InoutFunction<Input> {
+        return .concatenation(apply, other)
     }
 
     /// Creates a function that applies the given functions in sequence.
@@ -55,7 +68,7 @@ extension InoutFunction {
         _ functions: InoutFunction<Input>...,
         and finally: @escaping (inout Input) -> Void = { _ in }
     ) -> InoutFunction<Input> {
-        return .concatenation(functions.map { $0.update }, and: finally)
+        return .concatenation(functions.map { $0.apply }, and: finally)
     }
 
     /// Creates a function that applies the given functions in sequence.
@@ -83,12 +96,12 @@ extension InoutFunction {
 // MARK: - Function Conversion
 
 extension InoutFunction {
-    /// Converts this function to its non-`inout` equivalent by creating a copy of the input and applying the update.
+    /// Converts this function to its non-`inout` equivalent by creating a copy of the input and applying the apply.
     /// - Returns: This function converted to its non-`inout` equivalent.
     public func withoutInout() -> Function<Input, Input> {
         return .init { input in
             var input = input
-            self.update(&input)
+            self.apply(&input)
             return input
         }
     }

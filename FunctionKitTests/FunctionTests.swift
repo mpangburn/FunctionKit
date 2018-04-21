@@ -16,16 +16,16 @@ private let none: (Int) -> Int? = { _ in .none }
 private let funcInFuncOut: (@escaping (Int) -> Int) -> (Int) -> Int = { $0 }
 
 class FunctionTests: XCTestCase {
-    func testCall() {
+    func testApply() {
         let fooHasPrefix = "foo".hasPrefix
         XCTAssert(fooHasPrefix("fo"))
-        XCTAssert(Function(fooHasPrefix).call(with: "fo"))
+        XCTAssert(Function(fooHasPrefix).apply("fo"))
     }
 
     func testIdentity() {
         let identity: Function<Int, Int> = .identity()
         for integer in [.min, -42, -1, 0, 1, 42, .max] {
-            XCTAssertEqual(identity.call(with: integer), integer)
+            XCTAssertEqual(identity.apply(integer), integer)
         }
     }
 
@@ -37,26 +37,26 @@ class FunctionTests: XCTestCase {
     }
 
     func testKeyPathGet() {
-        let getCount: Function<[String], Int> = .get(\.count)
-        XCTAssertEqual(getCount.call(with: []), 0)
-        XCTAssertEqual(getCount.call(with: ["a", "b", "c"]), 3)
-        XCTAssertEqual(getCount.call(with: ["a", "b", "c", "d", "e"]), 5)
+        let getCount = Function.get(\String.count)
+        XCTAssertEqual(getCount.apply(""), 0)
+        XCTAssertEqual(getCount.apply("abc"), 3)
+        XCTAssertEqual(getCount.apply("abcde"), 5)
     }
 
     func testKeyPathUpdate() {
         struct Person { var firstName: String }
         let updateFirstName = Function.update(\Person.firstName)
-        let lowercaseFirstName = updateFirstName.call(with: { $0.lowercased() })
+        let lowercaseFirstName = updateFirstName.apply { $0.lowercased() }
         let michael = Person(firstName: "Michael")
         let lauren = Person(firstName: "Lauren")
-        XCTAssertEqual(lowercaseFirstName.call(with: michael).firstName, "michael")
-        XCTAssertEqual(lowercaseFirstName.call(with: lauren).firstName, "lauren")
+        XCTAssertEqual(lowercaseFirstName.apply(michael).firstName, "michael")
+        XCTAssertEqual(lowercaseFirstName.apply(lauren).firstName, "lauren")
 
         class PersonReference { var firstName: String; init(firstName: String) { self.firstName = firstName } }
         let updateFirstNameReference = Function.update(\PersonReference.firstName)
-        let lowercaseFirstNameReference = updateFirstNameReference.call(with: .init { $0.lowercased() })
+        let lowercaseFirstNameReference = updateFirstNameReference.apply { $0.lowercased() }
         let miguel = PersonReference(firstName: "Miguel")
-        _ = lowercaseFirstNameReference.call(with: miguel)
+        _ = lowercaseFirstNameReference.apply(miguel)
         XCTAssertEqual(miguel.firstName, "miguel")
     }
 
@@ -114,28 +114,28 @@ class FunctionTests: XCTestCase {
         let hasThumbsUp = "two thumbs up 👍👍 for this café"
         let hasThumbsUpData = hasThumbsUp.data(using: .utf8)!
         let doesNotHaveThumbsUpData = "👎".data(using: .utf8)!
-        XCTAssertEqual(indexOfThumbsUpFromDataAndEncoding.call(with: (hasThumbsUpData, .utf8)), hasThumbsUp.index(of: "👍"))
+        XCTAssertEqual(indexOfThumbsUpFromDataAndEncoding.apply((hasThumbsUpData, .utf8)), hasThumbsUp.index(of: "👍"))
         XCTAssertNil(String(data: hasThumbsUpData.dropLast(), encoding: .utf8))
-        XCTAssertNil(indexOfThumbsUpFromDataAndEncoding.call(with: (hasThumbsUpData.dropLast(), .utf8)))
-        XCTAssertNil(indexOfThumbsUpFromDataAndEncoding.call(with: (doesNotHaveThumbsUpData, .utf8)))
+        XCTAssertNil(indexOfThumbsUpFromDataAndEncoding.apply((hasThumbsUpData.dropLast(), .utf8)))
+        XCTAssertNil(indexOfThumbsUpFromDataAndEncoding.apply((doesNotHaveThumbsUpData, .utf8)))
     }
 
     func testSuccessfulChains() {
-        XCTAssertEqual(Function.chain(some, some).call(with: 5), .some(5))
-        XCTAssertEqual(Function.chain(some, some, some).call(with: 5), .some(5))
-        XCTAssertEqual(Function.chain(some, some, some, some).call(with: 5), .some(5))
-        XCTAssertEqual(Function.chain(some, some, some, some, some).call(with: 5), .some(5))
-        XCTAssertEqual(Function.chain(some, some, some, some, some, some).call(with: 5), .some(5))
+        XCTAssertEqual(Function.chain(some, some).apply(5), .some(5))
+        XCTAssertEqual(Function.chain(some, some, some).apply(5), .some(5))
+        XCTAssertEqual(Function.chain(some, some, some, some).apply(5), .some(5))
+        XCTAssertEqual(Function.chain(some, some, some, some, some).apply(5), .some(5))
+        XCTAssertEqual(Function.chain(some, some, some, some, some, some).apply(5), .some(5))
     }
 
     func testFailingChains() {
-        XCTAssertNil(Function.chain(none, some).call(with: 5))
-        XCTAssertNil(Function.chain(some, none).call(with: 5))
-        XCTAssertNil(Function.chain(none, none).call(with: 5))
-        XCTAssertNil(Function.chain(some, none, some).call(with: 5))
-        XCTAssertNil(Function.chain(some, some, some, none).call(with: 5))
-        XCTAssertNil(Function.chain(none, some, some, some, some).call(with: 5))
-        XCTAssertNil(Function.chain(some, none, none, none, some, some).call(with: 5))
+        XCTAssertNil(Function.chain(none, some).apply(5))
+        XCTAssertNil(Function.chain(some, none).apply(5))
+        XCTAssertNil(Function.chain(none, none).apply(5))
+        XCTAssertNil(Function.chain(some, none, some).apply(5))
+        XCTAssertNil(Function.chain(some, some, some, none).apply(5))
+        XCTAssertNil(Function.chain(none, some, some, some, some).apply(5))
+        XCTAssertNil(Function.chain(some, none, none, none, some, some).apply(5))
     }
 
     func testCompose() {
@@ -169,9 +169,9 @@ class FunctionTests: XCTestCase {
         let stringFromDataAndEncoding = Function(String.init(data:encoding:)).curried()
         let string = "turn me into data! 👍"
         let data = string.data(using: .utf8)!
-        let stringFromEncoding = stringFromDataAndEncoding.call(with: data)
-        XCTAssertNotEqual(stringFromEncoding.call(with: .ascii), string)
-        XCTAssertEqual(stringFromEncoding.call(with: .utf8), string)
+        let stringFromEncoding = stringFromDataAndEncoding.apply(data)
+        XCTAssertNotEqual(stringFromEncoding.apply(.ascii), string)
+        XCTAssertEqual(stringFromEncoding.apply(.utf8), string)
     }
 
     func testUncurry() {
@@ -180,7 +180,7 @@ class FunctionTests: XCTestCase {
             Function(String.hasPrefix).promotingOutput().uncurried()
         ]
         for uncurriedHasPrefix in uncurriedHasPrefixes {
-            XCTAssert(uncurriedHasPrefix.call(with: ("string", "str")))
+            XCTAssert(uncurriedHasPrefix.apply(("string", "str")))
         }
     }
 
@@ -189,19 +189,19 @@ class FunctionTests: XCTestCase {
             Function(String.init(data:encoding:))
                 .curried()
                 .flippingFirstTwoArguments()
-                .call(with: .utf8)
+                .apply(.utf8)
         let string = "turn me into data! 👍"
         let data = string.data(using: .utf8)!
-        XCTAssertEqual(utf8StringFromData.call(with: data), string)
+        XCTAssertEqual(utf8StringFromData.apply(data), string)
     }
 
     func testFlipWithoutCurry() {
         let stringStartsWithFoo =
             Function(String.hasPrefix)
                 .flippingFirstTwoArguments()
-                .call(with: "foo")
-        XCTAssertTrue(stringStartsWithFoo.call(with: "foobinacci"))
-        XCTAssertFalse(stringStartsWithFoo.call(with: "nope"))
+                .apply("foo")
+        XCTAssertTrue(stringStartsWithFoo.apply("foobinacci"))
+        XCTAssertFalse(stringStartsWithFoo.apply("nope"))
     }
 
     func testPromotion() {
@@ -211,10 +211,10 @@ class FunctionTests: XCTestCase {
     func testToInout() {
         let inoutIncrement = Function(increment).toInout()
         var x = 0
-        inoutIncrement.update(&x)
+        inoutIncrement.apply(&x)
         XCTAssertEqual(x, 1)
-        inoutIncrement.update(&x)
-        inoutIncrement.update(&x)
+        inoutIncrement.apply(&x)
+        inoutIncrement.apply(&x)
         XCTAssertEqual(x, 3)
     }
 }

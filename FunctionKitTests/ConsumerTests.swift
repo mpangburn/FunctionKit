@@ -17,9 +17,9 @@ class ConsumerTests: XCTestCase {
         let appendToString: Consumer<Int> = .init { string.append("\($0)") }
 
         let addToSumThenAppendToString = addToSum.then(appendToString)
-        addToSumThenAppendToString.call(with: 5)
-        addToSumThenAppendToString.call(with: 3)
-        addToSumThenAppendToString.call(with: 2)
+        addToSumThenAppendToString.apply(5)
+        addToSumThenAppendToString.apply(3)
+        addToSumThenAppendToString.apply(2)
 
         XCTAssertEqual(sum, 10)
         XCTAssertEqual(string, "532")

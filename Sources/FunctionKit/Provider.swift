@@ -12,6 +12,6 @@ extension Function where Input == Void {
     /// Invokes the supplier function and returns the output.
     /// - Returns: The output produced by the supplier function.
     public func make() -> Output {
-        return call(with: ())
+        return apply(())
     }
 }

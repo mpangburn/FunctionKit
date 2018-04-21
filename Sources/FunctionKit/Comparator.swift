@@ -5,7 +5,13 @@
 //  Created by Michael Pangburn on 4/13/18.
 //
 
+// TODO: Is is preferable to redefine ComparisonResult to remove the dependency on Foundation,
+//       or use Foundation.ComparisonResult for consistency with Foundation?
+
 import Foundation
+
+/// Constants that indicate sort order.
+public typealias ComparisonResult = Foundation.ComparisonResult
 
 /// A function that compares two values of the same type.
 public typealias Comparator<T> = Function<(T, T), ComparisonResult>
@@ -43,15 +49,14 @@ extension Function where Output == ComparisonResult {
     /// - Parameter comparableExtractor: A function providing a `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function.
     public static func comparing<T, Value: Comparable>(by comparableExtractor: Function<T, Value>) -> Comparator<T> where Input == (T, T) {
-        return Comparator<Value>.naturalOrder()
-            .composed(with: { (comparableExtractor.call(with: $0), comparableExtractor.call(with: $1)) })
+        return comparing(by: comparableExtractor.apply)
     }
 
     /// Returns a comparator that compares by extracting a `Comparable` value using the given function.
     /// - Parameter comparableExtractor: A function providing a `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function.
     public static func comparing<T, Value: Comparable>(by comparableExtractor: @escaping (T) -> Value) -> Comparator<T> where Input == (T, T) {
-        return comparing(by: .init(comparableExtractor))
+        return Comparator<Value>.naturalOrder().lifting(with: comparableExtractor)
     }
 }
 
@@ -112,7 +117,7 @@ extension Function where Output == ComparisonResult {
     /// - Parameter rhs: The right argument to compare.
     /// - Returns: The result of the comparison.
     public func compare<T>(_ lhs: T, _ rhs: T) -> ComparisonResult where Input == (T, T) {
-        return call(with: (lhs, rhs))
+        return apply(lhs, rhs)
     }
 
     /// Returns a new comparator that first compares using this comparator, then by the given comparator in the case where operands are ordered the same.
@@ -153,6 +158,20 @@ extension Function where Output == ComparisonResult {
             }
         }
     }
+
+    /// Lifts this comparator to one on a different type using the given function.
+    /// - Parameter extract: The function that maps from the type of the new comparator to the type of this comparator.
+    /// - Returns: A comparator created by composing the given function with this comparator.
+    public func lifting<T, U>(with extract: Function<U, T>) -> Comparator<U> where Input == (T, T) {
+        return lifting(with: extract.apply)
+    }
+
+    /// Lifts this comparator to one on a different type using the given function.
+    /// - Parameter extract: The function that maps from the type of the new comparator to the type of this comparator.
+    /// - Returns: A comparator created by composing the given function with this comparator.
+    public func lifting<T, U>(with extract: @escaping (U) -> T) -> Comparator<U> where Input == (T, T) {
+        return composed(with: { (extract($0), extract($1)) })
+    }
 }
 
 // MARK: - Optional Compatibility
@@ -175,7 +194,7 @@ extension Function where Output == ComparisonResult {
                 return .orderedAscending
             case (_, nil):
                 return .orderedDescending
-            case (let lhs?, let rhs?):
+            case let (lhs?, rhs?):
                 return comparator.compare(lhs, rhs)
             }
         }
@@ -186,8 +205,7 @@ extension Function where Output == ComparisonResult {
     /// - Parameter optionalComparableExtractor: A function providing an optional `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values before non-`nil` values.
     public static func nilValuesFirst<T, Value: Comparable>(by optionalComparableExtractor: Function<T, Value?>) -> Comparator<T> where Input == (T, T) {
-        return Comparator<Value?>.nilValuesFirst()
-            .composed(with: { (optionalComparableExtractor.call(with: $0), optionalComparableExtractor.call(with: $1)) })
+        return .nilValuesFirst(by: optionalComparableExtractor.apply)
     }
 
     /// Returns an optional-friendly comparator that compares by extracting a an optional `Comparable` key using the given function,
@@ -195,7 +213,7 @@ extension Function where Output == ComparisonResult {
     /// - Parameter optionalComparableExtractor: A function providing an optional `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values before non-`nil` values.
     public static func nilValuesFirst<T, Value: Comparable>(by optionalComparableExtractor: @escaping (T) -> Value?) -> Comparator<T> where Input == (T, T) {
-        return .nilValuesFirst(by: .init(optionalComparableExtractor))
+        return Comparator<Value?>.nilValuesFirst().lifting(with: optionalComparableExtractor)
     }
 
     /// Returns an optional-friendly comparator that orders `nil` values after non-`nil` values.
@@ -215,7 +233,7 @@ extension Function where Output == ComparisonResult {
                 return .orderedDescending
             case (_, nil):
                 return .orderedAscending
-            case (let lhs?, let rhs?):
+            case let (lhs?, rhs?):
                 return comparator.compare(lhs, rhs)
             }
         }
@@ -226,8 +244,7 @@ extension Function where Output == ComparisonResult {
     /// - Parameter optionalComparableExtractor: A function providing an optional `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values after non-`nil` values.
     public static func nilValuesLast<T, Value: Comparable>(by optionalComparableExtractor: Function<T, Value?>) -> Comparator<T> where Input == (T, T) {
-        return Comparator<Value?>.nilValuesLast()
-            .composed(with: { (optionalComparableExtractor.call(with: $0), optionalComparableExtractor.call(with: $1)) })
+        return .nilValuesLast(by: optionalComparableExtractor.apply)
     }
 
     /// Returns an optional-friendly comparator that compares by extracting a an optional `Comparable` key using the given function,
@@ -235,6 +252,6 @@ extension Function where Output == ComparisonResult {
     /// - Parameter optionalComparableExtractor: A function providing an optional `Comparable` value by which to compare.
     /// - Returns: A comparator that compares the values extracted using the given function, ordering `nil` values after non-`nil` values.
     public static func nilValuesLast<T, Value: Comparable>(by optionalComparableExtractor: @escaping (T) -> Value?) -> Comparator<T> where Input == (T, T) {
-        return .nilValuesLast(by: .init(optionalComparableExtractor))
+        return Comparator<Value?>.nilValuesLast().lifting(with: optionalComparableExtractor)
     }
 }

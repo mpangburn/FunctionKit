@@ -16,22 +16,22 @@ internal func promote<Input, Output>(_ f: @escaping (Input) -> Output) -> Functi
 /// such as composition and currying.
 public final class Function<Input, Output> {
     /// The wrapped Swift function.
-    /// This function is invoked with `call(with:)` for clarity.
-    private let _call: (Input) -> Output
+    /// This function is invoked with `apply(_:)`.
+    private let _apply: (Input) -> Output
 
     /// Calls the function with the given input.
     ///
     /// ```
     /// let fooHasPrefix: (String) -> Bool = "foo".hasPrefix
-    /// fooHasPrefix("fo")                      // true
-    /// Function(fooHasPrefix).call(with: "fo") // true
+    /// fooHasPrefix("fo")                 // true
+    /// Function(fooHasPrefix).apply("fo") // true
     /// ```
     /// - Parameter input: The input with which to call the function.
     /// - Returns: The output of the function.
     /// - Note: Referencing this function as a member serves as a method to turn a `Function<Input, Output>`
     ///         back into a Swift function of type `(Input) -> Output`.
-    public func call(with input: Input) -> Output {
-        return _call(input)
+    public func apply(_ input: Input) -> Output {
+        return _apply(input)
     }
 
     /// Creates a `Function` from a Swift function.
@@ -41,7 +41,7 @@ public final class Function<Input, Output> {
     /// - Parameter f: The Swift function to promote.
     /// - Returns: The promoted function.
     public init(_ f: @escaping (Input) -> Output) {
-        self._call = f
+        self._apply = f
     }
 }
 
@@ -82,7 +82,7 @@ extension Function {
         return .init { update in
             .init { root in
                 var copy = root
-                copy[keyPath: keyPath] = update.call(with: root[keyPath: keyPath])
+                copy[keyPath: keyPath] = update.apply(root[keyPath: keyPath])
                 return copy
             }
         }
@@ -98,7 +98,7 @@ extension Function {
     /// - Parameter other: The function into which to pipe the output of this function.
     /// - Returns: A new function that pipes the output of this function into the given function.
     public func piped<C>(into other: Function<Output, C>) -> Function<Input, C> {
-        return piped(into: other.call)
+        return piped(into: other.apply)
     }
 
     /// Returns a new function that pipes the output of this function into another function.
@@ -108,7 +108,7 @@ extension Function {
     /// - Returns: A new function that pipes the output of this function into the given function.
     public func piped<C>(into other: @escaping (Output) -> C) -> Function<Input, C> {
         return .init { input in
-            other(self.call(with: input))
+            other(self.apply(input))
         }
     }
 
@@ -248,7 +248,7 @@ extension Function {
 extension Function where Input == Output {
     /// Returns a new function that pipes the output of this function into the other.
     ///
-    /// Concatenation is forward composition restricted to functions whose input and output types are equal.
+    /// Concatenation is forward composition restricted to functions whose input and output types are the same.
     /// - Parameter other: The function with which to concatenate.
     /// - Returns: A new function concatenating this function with the other.
     public func concatenated(with other: Function<Input, Output>) -> Function<Input, Output> {
@@ -257,16 +257,16 @@ extension Function where Input == Output {
 
     /// Returns a new function that pipes the output of this function into the other.
     ///
-    /// Concatenation is forward composition restricted to functions whose input and output types are equal.
+    /// Concatenation is forward composition restricted to functions whose input and output types are the same.
     /// - Parameter other: The function with which to concatenate.
     /// - Returns: A new function concatenating this function with the other.
     public func concatenated(with other: @escaping (Input) -> Output) -> Function<Input, Output> {
-        return .concatenation(call, other)
+        return .concatenation(apply, other)
     }
 
     /// Returns a function that pipes the output of each function into the next, and so forth for all given functions.
     ///
-    /// Concatenation is forward composition restricted to functions whose input and output types are equal.
+    /// Concatenation is forward composition restricted to functions whose input and output types are the same.
     /// - Parameter functions: The functions to concatenate in sequence.
     /// - Parameter finally: An optional function as a convenience for trailing closure syntax.
     /// - Returns: A function concatenating the given functions.
@@ -274,12 +274,12 @@ extension Function where Input == Output {
         _ functions: Function<Input, Output>...,
         and finally: @escaping (Input) -> Output = { $0 }
     ) -> Function<Input, Output> {
-        return .concatenation(functions.map { $0.call }, and: finally)
+        return .concatenation(functions.map { $0.apply }, and: finally)
     }
 
     /// Returns a function that pipes the output of each function into the next, and so forth for all given functions.
     ///
-    /// Concatenation is forward composition restricted to functions whose input and output types are equal.
+    /// Concatenation is forward composition restricted to functions whose input and output types are the same.
     /// - Parameter functions: The functions to concatenate in sequence.
     /// - Parameter finally: An optional function as a convenience for trailing closure syntax.
     /// - Returns: A function concatenating the given functions.
@@ -309,7 +309,7 @@ extension Function {
     /// - Parameter other: The function with which to chain.
     /// - Returns: A new function that pipes the output of this function into the next when not `nil`.
     public func chained<B, C>(with other: Function<B, C?>) -> Function<Input, C?> where Output == B? {
-        return chained(with: other.call)
+        return chained(with: other.apply)
     }
 
     /// Returns a new function that pipes the output of this function into the next when not `nil`.
@@ -319,7 +319,7 @@ extension Function {
     /// - Returns: A new function that pipes the output of this function into the next when not `nil`.
     public func chained<B, C>(with other: @escaping (B) -> C?) -> Function<Input, C?> where Output == B? {
         return .init { input in
-            self.call(with: input).flatMap(other)
+            self.apply(input).flatMap(other)
         }
     }
 
@@ -473,7 +473,7 @@ extension Function {
     /// - Parameter other: The function with which to compose.
     /// - Returns: A new function that pipes the output of the given function into this function.
     public func composed<A>(with other: Function<A, Input>) -> Function<A, Output> {
-        return composed(with: other.call)
+        return composed(with: other.apply)
     }
 
     /// Returns a new function that pipes the output of the given function into this function.
@@ -483,7 +483,7 @@ extension Function {
     /// - Returns: A new function that pipes the output of the given function into this function.
     public func composed<A>(with other: @escaping (A) -> Input) -> Function<A, Output> {
         return .init { a in
-            self.call(with: other(a))
+            self.apply(other(a))
         }
     }
 
@@ -620,76 +620,111 @@ extension Function {
 
 // MARK: - Currying
 
+/// A function of shape `(A) -> (B) -> C`.
+///
+/// This type can be viewed as a two argument function with its arguments separated to allow for partial application.
+public typealias CurriedTwoArgumentFunction<A, B, C> = Function<A, Function<B, C>>
+
+/// A function of shape `(A) -> (B) -> (C) -> D`.
+///
+/// This type can be viewed as a three argument function with its arguments separated to allow for partial application.
+public typealias CurriedThreeArgumentFunction<A, B, C, D> = Function<A, Function<B, Function<C, D>>>
+
+/// A function of shape `(A) -> (B) -> (C) -> (D) -> E`.
+///
+/// This type can be viewed as a four argument function with its arguments separated to allow for partial application.
+public typealias CurriedFourArgumentFunction<A, B, C, D, E> = Function<A, Function<B, Function<C, Function<D, E>>>>
+
+/// A function of shape `(A) -> (B) -> (C) -> (D) -> (E) -> F`.
+///
+/// This type can be viewed as a five argument function with its arguments separated to allow for partial application.
+public typealias CurriedFiveArgumentFunction<A, B, C, D, E, F> = Function<A, Function<B, Function<C, Function<D, Function<E, F>>>>>
+
+/// A function of shape `(A) -> (B) -> (C) -> (D) -> (E) -> (F) -> G`.
+///
+/// This type can be viewed as a six argument function with its arguments separated to allow for partial application.
+public typealias CurriedSixArgumentFunction<A, B, C, D, E, F, G> = Function<A, Function<B, Function<C, Function<D, Function<E, Function<F, G>>>>>>
+
+/// A function of shape `(A) -> (B) -> (C) -> (D) -> (E) -> (F) -> (G) -> H`.
+///
+/// This type can be viewed as a seven argument function with its arguments separated to allow for partial application.
+public typealias CurriedSevenArgumentFunction<A, B, C, D, E, F, G, H> = Function<A, Function<B, Function<C, Function<D, Function<E, Function<F, Function<G, H>>>>>>>
+
+/// A function of shape `(A) -> (B) -> (C) -> (D) -> (E) -> (F) -> (G) -> (H) -> I`.
+///
+/// This type can be viewed as an eight argument function with its arguments separated to allow for partial application.
+public typealias CurriedEightArgumentFunction<A, B, C, D, E, F, G, H, I> = Function<A, Function<B, Function<C, Function<D, Function<E, Function<F, Function<G, Function<H, I>>>>>>>>
+
 extension Function {
-    /// Returns a new function that outputs a sequence of functions by "separating" this function's tuple input argument.
+    /// Returns a new function that outputs a sequence of functions by separating this function's tuple input argument.
     ///
     /// This process of currying can be described as
     ///
     /// `(A, B) -> C => (A) -> (B) -> C`
     /// - Returns: This function in curried form.
     public func curried<A, B>()
-        -> Function<A, Function<B, Output>>
+        -> CurriedTwoArgumentFunction<A, B, Output>
         where Input == (A, B) {
             return .init { a in
                 .init { b in
-                    self.call(with: (a, b))
+                    self.apply((a, b))
                 }
             }
     }
 
-    /// Returns a new function that outputs a sequence of functions by "separating" this function's tuple input argument.
+    /// Returns a new function that outputs a sequence of functions by separating this function's tuple input argument.
     ///
     /// This process of currying can be described as
     ///
     /// `(A, B, C) -> D => (A) -> (B) -> (C) -> D`
     /// - Returns: This function in curried form.
     public func curried<A, B, C>()
-        -> Function<A, Function<B, Function<C, Output>>>
+        -> CurriedThreeArgumentFunction<A, B, C, Output>
         where Input == (A, B, C) {
             return .init { a in
                 .init { b in
                     .init { c in
-                        self.call(with: (a, b, c))
+                        self.apply((a, b, c))
                     }
                 }
             }
     }
 
-    /// Returns a new function that outputs a sequence of functions by "separating" this function's tuple input argument.
+    /// Returns a new function that outputs a sequence of functions by separating this function's tuple input argument.
     ///
     /// This process of currying can be described as
     ///
     /// `(A, B, C, D) -> E => (A) -> (B) -> (C) -> (D) -> E`
     /// - Returns: This function in curried form.
     public func curried<A, B, C, D>()
-        -> Function<A, Function<B, Function<C, Function<D, Output>>>>
+        -> CurriedFourArgumentFunction<A, B, C, D, Output>
         where Input == (A, B, C, D) {
             return .init { a in
                 .init { b in
                     .init { c in
                         .init { d in
-                            self.call(with: (a, b, c, d))
+                            self.apply((a, b, c, d))
                         }
                     }
                 }
             }
     }
 
-    /// Returns a new function that outputs a sequence of functions by "separating" this function's tuple input argument.
+    /// Returns a new function that outputs a sequence of functions by separating this function's tuple input argument.
     ///
     /// This process of currying can be described as
     ///
     /// `(A, B, C, D, E) -> F => (A) -> (B) -> (C) -> (D) -> (E) -> F`
     /// - Returns: This function in curried form.
     public func curried<A, B, C, D, E>()
-        -> Function<A, Function<B, Function<C, Function<D, Function<E, Output>>>>>
+        -> CurriedFiveArgumentFunction<A, B, C, D, E, Output>
         where Input == (A, B, C, D, E) {
             return .init { a in
                 .init { b in
                     .init { c in
                         .init { d in
                             .init { e in
-                                self.call(with: (a, b, c, d, e))
+                                self.apply((a, b, c, d, e))
                             }
                         }
                     }
@@ -697,14 +732,14 @@ extension Function {
             }
     }
 
-    /// Returns a new function that outputs a sequence of functions by "separating" this function's tuple input argument.
+    /// Returns a new function that outputs a sequence of functions by separating this function's tuple input argument.
     ///
     /// This process of currying can be described as
     ///
     /// `(A, B, C, D, E, F) -> G => (A) -> (B) -> (C) -> (D) -> (E) -> (F) -> G`
     /// - Returns: This function in curried form.
     public func curried<A, B, C, D, E, F>()
-        -> Function<A, Function<B, Function<C, Function<D, Function<E, Function<F, Output>>>>>>
+        -> CurriedSixArgumentFunction<A, B, C, D, E, F, Output>
         where Input == (A, B, C, D, E, F) {
             return .init { a in
                 .init { b in
@@ -712,7 +747,7 @@ extension Function {
                         .init { d in
                             .init { e in
                                 .init { f in
-                                    self.call(with: (a, b, c, d, e, f))
+                                    self.apply((a, b, c, d, e, f))
                                 }
                             }
                         }
@@ -721,14 +756,14 @@ extension Function {
             }
     }
 
-    /// Returns a new function that outputs a sequence of functions by "separating" this function's tuple input argument.
+    /// Returns a new function that outputs a sequence of functions by separating this function's tuple input argument.
     ///
     /// This process of currying can be described as
     ///
     /// `(A, B, C, D, E, F, G) -> H => (A) -> (B) -> (C) -> (D) -> (E) -> (F) -> (G) -> H`
     /// - Returns: This function in curried form.
     public func curried<A, B, C, D, E, F, G>()
-        -> Function<A, Function<B, Function<C, Function<D, Function<E, Function<F, Function<G, Output>>>>>>>
+        -> CurriedSevenArgumentFunction<A, B, C, D, E, F, G, Output>
         where Input == (A, B, C, D, E, F, G) {
             return .init { a in
                 .init { b in
@@ -737,7 +772,7 @@ extension Function {
                             .init { e in
                                 .init { f in
                                     .init { g in
-                                        self.call(with: (a, b, c, d, e, f, g))
+                                        self.apply((a, b, c, d, e, f, g))
                                     }
                                 }
                             }
@@ -747,14 +782,14 @@ extension Function {
             }
     }
 
-    /// Returns a new function that outputs a sequence of functions by "separating" this function's tuple input argument.
+    /// Returns a new function that outputs a sequence of functions by separating this function's tuple input argument.
     ///
     /// This process of currying can be described as
     ///
     /// `(A, B, C, D, E, F, G, H) -> I => (A) -> (B) -> (C) -> (D) -> (E) -> (F) -> (G) -> (H) -> I`
     /// - Returns: This function in curried form.
     public func curried<A, B, C, D, E, F, G, H>()
-        -> Function<A, Function<B, Function<C, Function<D, Function<E, Function<F, Function<G, Function<H, Output>>>>>>>>
+        -> CurriedEightArgumentFunction<A, B, C, D, E, F, G, H, Output>
         where Input == (A, B, C, D, E, F, G, H) {
             return .init { a in
                 .init { b in
@@ -764,7 +799,7 @@ extension Function {
                                 .init { f in
                                     .init { g in
                                         .init { h in
-                                            self.call(with: (a, b, c, d, e, f, g, h))
+                                            self.apply((a, b, c, d, e, f, g, h))
                                         }
                                     }
                                 }
@@ -786,7 +821,7 @@ extension Function {
     ///         is "separated" to create a sequence of functions. See the `curried()` method for more info.
     public func uncurried<B, C>() -> Function<(Input, B), C> where Output == Function<B, C> {
         return .init { input, b in
-            self.call(with: input).call(with: b)
+            self.apply(input).apply(b)
         }
     }
 
@@ -818,7 +853,7 @@ extension Function {
         where Output == Function<Void, C> {
             return .init {
                 .init { input in
-                    self.call(with: input).call(with: ())
+                    self.apply(input).apply(())
                 }
             }
     }
@@ -834,7 +869,7 @@ extension Function {
         where Output == Function<B, C> {
             return .init { b in
                 .init { input in
-                    self.call(with: input).call(with: b)
+                    self.apply(input).apply(b)
                 }
             }
     }
@@ -862,7 +897,7 @@ extension Function {
         where Output == Function<(B, C), D> {
             return .init { bc in
                 .init { input in
-                    self.call(with: input).call(with: bc)
+                    self.apply(input).apply(bc)
                 }
             }
     }
@@ -890,7 +925,7 @@ extension Function {
         where Output == Function<(B, C, D), E> {
             return .init { bcd in
                 .init { input in
-                    self.call(with: input).call(with: bcd)
+                    self.apply(input).apply(bcd)
                 }
             }
     }
@@ -918,7 +953,7 @@ extension Function {
         where Output == Function<(B, C, D, E), F> {
             return .init { bcde in
                 .init { input in
-                    self.call(with: input).call(with: bcde)
+                    self.apply(input).apply(bcde)
                 }
             }
     }
@@ -946,7 +981,7 @@ extension Function {
         where Output == Function<(B, C, D, E, F), G> {
             return .init { bcdef in
                 .init { input in
-                    self.call(with: input).call(with: bcdef)
+                    self.apply(input).apply(bcdef)
                 }
             }
     }
@@ -974,7 +1009,7 @@ extension Function {
         where Output == Function<(B, C, D, E, F, G), H> {
             return .init { bcdefg in
                 .init { input in
-                    self.call(with: input).call(with: bcdefg)
+                    self.apply(input).apply(bcdefg)
                 }
             }
     }
@@ -1001,7 +1036,7 @@ extension Function {
         -> Function<Function<Void, B>, Output>
         where Input == () -> B {
             return .init { input in
-                self.call(with: input.call)
+                self.apply(input.apply)
             }
     }
 
@@ -1011,7 +1046,7 @@ extension Function {
         -> Function<Function<A, B>, Output>
         where Input == (A) -> B {
             return .init { input in
-                self.call(with: input.call)
+                self.apply(input.apply)
             }
     }
 
@@ -1023,8 +1058,8 @@ extension Function {
             return .init { input in
                 // if we don't declare f as a separate variable, we get a compile-time error here
                 // TODO: reproduce and file a bug report
-                let f = input.call
-                return self.call(with: f)
+                let f = input.apply
+                return self.apply(f)
             }
     }
 
@@ -1034,8 +1069,8 @@ extension Function {
         -> Function<Function<(A, B, C), D>, Output>
         where Input == (A, B, C) -> D {
             return .init { input in
-                let f = input.call
-                return self.call(with: f)
+                let f = input.apply
+                return self.apply(f)
             }
     }
 
@@ -1045,8 +1080,8 @@ extension Function {
         -> Function<Function<(A, B, C, D), E>, Output>
         where Input == (A, B, C, D) -> E {
             return .init { input in
-                let f = input.call
-                return self.call(with: f)
+                let f = input.apply
+                return self.apply(f)
             }
     }
 
@@ -1056,8 +1091,8 @@ extension Function {
         -> Function<Function<(A, B, C, D, E), F>, Output>
         where Input == (A, B, C, D, E) -> F {
             return .init { input in
-                let f = input.call
-                return self.call(with: f)
+                let f = input.apply
+                return self.apply(f)
             }
     }
 
@@ -1067,8 +1102,8 @@ extension Function {
         -> Function<Function<(A, B, C, D, E, F), G>, Output>
         where Input == (A, B, C, D, E, F) -> G {
             return .init { input in
-                let f = input.call
-                return self.call(with: f)
+                let f = input.apply
+                return self.apply(f)
             }
     }
 
@@ -1078,7 +1113,7 @@ extension Function {
         -> Function<Input, Function<Void, C>>
         where Output == () -> C {
             return .init { input in
-                .init(self.call(with: input))
+                .init(self.apply(input))
             }
     }
 
@@ -1088,7 +1123,7 @@ extension Function {
         -> Function<Input, Function<B, C>>
         where Output == (B) -> C {
             return .init { input in
-                .init(self.call(with: input))
+                .init(self.apply(input))
             }
     }
 
@@ -1098,7 +1133,7 @@ extension Function {
         -> Function<Input, Function<(B, C), D>>
         where Output == (B, C) -> D {
             return .init { input in
-                .init(self.call(with: input))
+                .init(self.apply(input))
             }
     }
 
@@ -1108,7 +1143,7 @@ extension Function {
         -> Function<Input, Function<(B, C, D), E>>
         where Output == (B, C, D) -> E {
             return .init { input in
-                .init(self.call(with: input))
+                .init(self.apply(input))
             }
     }
 
@@ -1118,7 +1153,7 @@ extension Function {
         -> Function<Input, Function<(B, C, D, E), F>>
         where Output == (B, C, D, E) -> F {
             return .init { input in
-                .init(self.call(with: input))
+                .init(self.apply(input))
             }
     }
 
@@ -1128,7 +1163,7 @@ extension Function {
         -> Function<Input, Function<(B, C, D, E, F), G>>
         where Output == (B, C, D, E, F) -> G {
             return .init { input in
-                .init(self.call(with: input))
+                .init(self.apply(input))
             }
     }
 
@@ -1138,7 +1173,7 @@ extension Function {
         -> Function<Input, Function<(B, C, D, E, F, G), H>>
         where Output == (B, C, D, E, F, G) -> H {
             return .init { input in
-                .init(self.call(with: input))
+                .init(self.apply(input))
             }
     }
 }
@@ -1150,7 +1185,7 @@ extension Function where Input == Output {
     /// - Returns: This function converted to its `inout` equivalent.
     public func toInout() -> InoutFunction<Input> {
         return .init { input in
-            input = self.call(with: input)
+            input = self.apply(input)
         }
     }
 }
@@ -1162,7 +1197,115 @@ extension Function {
     /// This is a convenience method to call a `Function` taking `Function` input with a Swift function.
     /// - Parameter input: The input with which to call the function.
     /// - Returns: The output of the function.
-    public func call<A, B>(with input: @escaping (A) -> B) -> Output where Input == Function<A, B> {
-        return call(with: .init(input))
+    public func apply<A, B>(_ input: @escaping (A) -> B) -> Output where Input == Function<A, B> {
+        return apply(.init(input))
+    }
+
+    /// Calls the function with the given input.
+    /// This is a convenience method to call a `Function` taking `InoutFunction` input with a Swift function.
+    /// - Parameter input: The input with which to call the function.
+    /// - Returns: The output of the function.
+    public func apply<A>(_ input: @escaping (inout A) -> Void) -> Output where Input == InoutFunction<A> {
+        return apply(.init(input))
+    }
+}
+
+extension Function {
+    /// Calls the function with the given input.
+    ///
+    /// - Parameter a: The first argument to the function.
+    /// - Parameter b: The second argument to the function.
+    /// - Returns: The output of the function.
+    /// - Note: Referencing this function as a member serves as a method to turn a `Function<Input, Output>`
+    ///         back into a Swift function of type `(Input) -> Output`.
+    public func apply<A, B>(_ a: A, _ b: B) -> Output where Input == (A, B) {
+        return apply((a, b))
+    }
+
+    /// Calls the function with the given input.
+    ///
+    /// - Parameter a: The first argument to the function.
+    /// - Parameter b: The second argument to the function.
+    /// - Parameter c: The third argument to the function.
+    /// - Returns: The output of the function.
+    /// - Note: Referencing this function as a member serves as a method to turn a `Function<Input, Output>`
+    ///         back into a Swift function of type `(Input) -> Output`.
+    public func apply<A, B, C>(_ a: A, _ b: B, _ c: C) -> Output where Input == (A, B, C) {
+        return apply((a, b, c))
+    }
+
+    /// Calls the function with the given input.
+    ///
+    /// - Parameter a: The first argument to the function.
+    /// - Parameter b: The second argument to the function.
+    /// - Parameter c: The third argument to the function.
+    /// - Parameter d: The fourth argument to the function.
+    /// - Returns: The output of the function.
+    /// - Note: Referencing this function as a member serves as a method to turn a `Function<Input, Output>`
+    ///         back into a Swift function of type `(Input) -> Output`.
+    public func apply<A, B, C, D>(_ a: A, _ b: B, _ c: C, _ d: D) -> Output where Input == (A, B, C, D) {
+        return apply((a, b, c, d))
+    }
+
+    /// Calls the function with the given input.
+    ///
+    /// - Parameter a: The first argument to the function.
+    /// - Parameter b: The second argument to the function.
+    /// - Parameter c: The third argument to the function.
+    /// - Parameter d: The fourth argument to the function.
+    /// - Parameter e: The fifth argument to the function.
+    /// - Returns: The output of the function.
+    /// - Note: Referencing this function as a member serves as a method to turn a `Function<Input, Output>`
+    ///         back into a Swift function of type `(Input) -> Output`.
+    public func apply<A, B, C, D, E>(_ a: A, _ b: B, _ c: C, _ d: D, _ e: E) -> Output where Input == (A, B, C, D, E) {
+        return apply((a, b, c, d, e))
+    }
+
+    /// Calls the function with the given input.
+    ///
+    /// - Parameter a: The first argument to the function.
+    /// - Parameter b: The second argument to the function.
+    /// - Parameter c: The third argument to the function.
+    /// - Parameter d: The fourth argument to the function.
+    /// - Parameter e: The fifth argument to the function.
+    /// - Parameter f: The sixth argument to the function.
+    /// - Returns: The output of the function.
+    /// - Note: Referencing this function as a member serves as a method to turn a `Function<Input, Output>`
+    ///         back into a Swift function of type `(Input) -> Output`.
+    public func apply<A, B, C, D, E, F>(_ a: A, _ b: B, _ c: C, _ d: D, _ e: E, _ f: F) -> Output where Input == (A, B, C, D, E, F) {
+        return apply((a, b, c, d, e, f))
+    }
+
+    /// Calls the function with the given input.
+    ///
+    /// - Parameter a: The first argument to the function.
+    /// - Parameter b: The second argument to the function.
+    /// - Parameter c: The third argument to the function.
+    /// - Parameter d: The fourth argument to the function.
+    /// - Parameter e: The fifth argument to the function.
+    /// - Parameter f: The sixth argument to the function.
+    /// - Parameter g: The seventh argument to the function.
+    /// - Returns: The output of the function.
+    /// - Note: Referencing this function as a member serves as a method to turn a `Function<Input, Output>`
+    ///         back into a Swift function of type `(Input) -> Output`.
+    public func apply<A, B, C, D, E, F, G>(_ a: A, _ b: B, _ c: C, _ d: D, _ e: E, _ f: F, _ g: G) -> Output where Input == (A, B, C, D, E, F, G) {
+        return apply((a, b, c, d, e, f, g))
+    }
+
+    /// Calls the function with the given input.
+    ///
+    /// - Parameter a: The first argument to the function.
+    /// - Parameter b: The second argument to the function.
+    /// - Parameter c: The third argument to the function.
+    /// - Parameter d: The fourth argument to the function.
+    /// - Parameter e: The fifth argument to the function.
+    /// - Parameter f: The sixth argument to the function.
+    /// - Parameter g: The seventh argument to the function.
+    /// - Parameter h: The eighth argument to the function.
+    /// - Returns: The output of the function.
+    /// - Note: Referencing this function as a member serves as a method to turn a `Function<Input, Output>`
+    ///         back into a Swift function of type `(Input) -> Output`.
+    public func apply<A, B, C, D, E, F, G, H>(_ a: A, _ b: B, _ c: C, _ d: D, _ e: E, _ f: F, _ g: G, _ h: H) -> Output where Input == (A, B, C, D, E, F, G, H) {
+        return apply((a, b, c, d, e, f, g, h))
     }
 }

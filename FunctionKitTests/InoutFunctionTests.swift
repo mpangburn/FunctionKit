@@ -15,29 +15,38 @@ private let square: (inout Int) -> Void = { $0 *= $0 }
 class InoutFunctionTests: XCTestCase {
     func testConcat() {
         let incrementAndSquares = [
-            InoutFunction(increment).concatenating(with: square),
-            InoutFunction(increment).concatenating(with: .init(square)),
+            InoutFunction(increment).concatenated(with: square),
+            InoutFunction(increment).concatenated(with: .init(square)),
             InoutFunction.concatenation(increment, square),
             InoutFunction.concatenation(.init(increment), .init(square))
         ]
         for incrementAndSquare in incrementAndSquares {
             var numbers = [1, 2, 3]
             for index in numbers.indices {
-                incrementAndSquare.update(&numbers[index])
+                incrementAndSquare.apply(&numbers[index])
             }
             XCTAssertEqual(numbers, [4, 9, 16])
         }
 
         let incrementSixTimes = InoutFunction.concatenation(increment, increment, increment, increment, increment, increment)
         var x = 0
-        incrementSixTimes.update(&x)
+        incrementSixTimes.apply(&x)
         XCTAssertEqual(x, 6)
+    }
+
+    func testUpdate() {
+        struct Person { var name: String }
+        let updateName = InoutFunction.update(\Person.name)
+        let lowercasename = updateName.apply { $0 = $0.lowercased() }
+        var michael = Person(name: "MICHAEL")
+        lowercasename.apply(&michael)
+        XCTAssert(michael.name == "michael")
     }
 
     func testWithoutInout() {
         let nonInoutIncrement = InoutFunction(increment).withoutInout()
         let x = 0
-        XCTAssertEqual(nonInoutIncrement.call(with: x), 1)
-        XCTAssertEqual(nonInoutIncrement.call(with: x), 1)
+        XCTAssertEqual(nonInoutIncrement.apply(x), 1)
+        XCTAssertEqual(nonInoutIncrement.apply(x), 1)
     }
 }

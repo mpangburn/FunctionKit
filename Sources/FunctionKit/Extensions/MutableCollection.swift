@@ -7,8 +7,6 @@
 
 extension MutableCollection where Self: RandomAccessCollection {
     public mutating func sort(by comparator: Comparator<Element>) {
-        sort { lhs, rhs in
-            comparator.compare(lhs, rhs) == .orderedAscending
-        }
+        sort { comparator.compare($0, $1) == .orderedAscending }
     }
 }
