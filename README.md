@@ -78,7 +78,7 @@ We can use composition to transform type, too:
 
 ```swift
 let sanitizedCount = sanitize.piped(into: { $0.count })
-let sanitizeNameCounts = names.map(sanitizedCount) // [Int]
+let sanitizedNameCounts = names.map(sanitizedCount) // [Int]
 ```
 
 By employing functions as composable, transformative units, we enhance modularity and expressivity. FunctionKit provides a number of tools to make working with functional types easy.
@@ -256,7 +256,7 @@ The static `update` method takes in a `WritableKeyPath<Root, Value>` and returns
 
 ```swift
 struct Person {
-	var name: String
+    var name: String
 }
 
 let updateName = Function.update(\Person.name)           // Function<Function<String, String>, Function<Person, Person>>
