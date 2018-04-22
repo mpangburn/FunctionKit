@@ -41,38 +41,57 @@ let incrementedNumbers = numbers.map { $0 + 1 }   // [2, 3, 4, 5, 6]
 let evenNumbers = numbers.filter { $0 % 2 == 0 }  // [2, 4]
 ```
 
-Sometimes it's desirable to perform multiple operations on a sequence:
+Suppose we're doing some simple input sanitization for a user's name entry. We might proceed in several steps:
 
 ```swift
-let names = ["LAUREN  ", "michael", "JiM", "  Alison"]
-let sanitizedNames = names
-    .map(removeExtraWhitespace)
-    .map(capitalizeProperly)
+let name = nameTextField.text
+let withoutExtraWhitespace = removeExtraWhitespace(name)
+let withoutEmojis = removeWeirdUnicodeCharacters(withoutExtraWhitespace)
+let properlyCapitalized = capitalizeProperly(withoutEmojis)
 ```
 
-This seems nice, but we've introduced an inefficiency: in mapping over the array twice, we unnecessarily create an intermediate array. Here are a couple potential solutions:
-
-1. Make the function calls together in a single map.
-2. Use the `lazy` property.
-
-Option 1 quickly becomes a parenthetical nightmare, and option 2 often hurts readability because of the need to subsequently call the `Array` initializer. Function composition can solve this problem elegantly:
+This looks like a job for a helper function. Let's write a quick one:
 
 ```swift
-let sanitize = Function(removeExtraWhitespace).piped(into: capitalizeProperly)
+func sanitize(name: String) -> String {
+    let withoutExtraWhitespace = removeExtraWhitespace(name)
+    let withoutEmojis = removeWeirdUnicodeCharacters(withoutExtraWhitespace)
+    let properlyCapitalized = capitalizeProperly(withoutEmojis)
+    return properlyCapitalized
+}
+```
+
+You might even choose to write this in a one-liner:
+
+```swift
+func sanitize(name: String) -> String {
+    return properlyCapitalized(withoutEmojis(removeExtraWhitespace(name)))
+}
+```
+
+Unfortunately, as we call more functions on the same input, we appear to fall into one of two problems, depending on our approach:
+
+1. An excess of local variables to separate out the steps.
+2. A parenthetical mess.
+
+While the optimizer should ensure the functionality is the same in either case, option 1 feels unnecessarily verbose, and option 2 is a significant hindrance to the left-to-right readability of code.
+
+FunctionKit allows us to rewrite this function simply, clearly, and declaratively using composition:
+
+```swift
+let sanitize = Function.pipeline(removeExtraWhitespace, removeWeirdUnicodeCharacters, capitalizeProperly)
 let sanitizedNames = names.map(sanitize)
 ```
 
 What's happening here?
 
-As powerful as Swift functions are, we unfortunately cannot write 
+During a math course at some point in your life, you were probably introduced to the idea of function composition:
 
-```swift
-extension <A, B> (A) -> B {
-    // implement a method for all functions of form (A) -> B
-}
-```
+`(g ∘ f)(x) = g(f(x))`
 
-Instead, we use the `Function` type to wrap a Swift function and provide it with powerful new functionality—pun intended. The `piped(into:)` method creates a new function that takes the output of `removeExtraWhitespace` and uses it as the input for `capitalizeProperly`.
+The basic idea is that a new function can be created by taking the output of one function and using it as the input for another.
+
+We use the `Function` type to wrap a Swift function and provide it with powerful new functionality—pun intended. The static `pipeline` method pipes forward the output of each function into the next. The `piped(into:)` instance method does the same for an individual function.
 
 We can use composition to transform type, too:
 
